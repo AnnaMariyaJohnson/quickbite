@@ -1,31 +1,51 @@
 import {View, Text,Image,TouchableOpacity} from 'react-native';
-import {COLORS,SIZES} from '../../constants/colors';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../navigation/types';
 
 type RestaurantCardProps={
+    id:string;
     name:string;
     image:string;
     cuisine:string;
     rating:number;
     time:string;
     deliveryFee:string;
-    onPress:()=> void;
 };
 
+type RestaurantNavigationProp=NativeStackNavigationProp<RootStackParamList, 'Restaurant'>
+
 export default function RestaurantCard({
+    id,
     name,
     image,
     cuisine,
     rating, 
     time,
     deliveryFee,
-    onPress,
 }:RestaurantCardProps){
+    const navigation=useNavigation<RestaurantNavigationProp>();
+
+    const handlePress =()=>{
+        navigation.navigate('Restaurant',{
+            restaurant:{
+                id,
+                name,
+                image,
+                cuisine,
+                rating,
+                time,
+                deliveryFee
+            },
+        });
+    };
+
     return(
         <TouchableOpacity
-            onPress={onPress}
+            onPress={handlePress}
             className='mb-5 rounded-3xl overflow-hidden bg-zinc-900'
             activeOpacity={0.9}>
-                <Image source={{uri:image}} className='"w-full h-48'/>
+                <Image source={{uri:image}} className='"w-full h-48' resizeMode='cover'/>
                 <View className='p-4'>
                     <View className='flex-row justify-between items-start'>
                         <Text className='text-white text-lg font-semibold flex-1' numberOfLines={1}>

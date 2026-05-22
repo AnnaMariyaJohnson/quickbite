@@ -12,12 +12,13 @@ export type CartItem={
 type cartStore={
     items:CartItem[];
     restaurantId:string | null;
-    addToCart:(item:Omit<CartItem,'quantity'>,retaurantId:string)=>void;
+    addToCart:(item:Omit<CartItem,'quantity'>,restaurantId:string)=>void;
     removeFromCart:(id:string)=>void;
     increaseQuantity:(id:string)=>void;
     decreaseQuantity:(id:string)=>void;
     clearCart:()=>void;
     totalItems:number;
+    totalPrice:number;
 };
 
 export const useCartStore =create<cartStore>((set,get)=>({

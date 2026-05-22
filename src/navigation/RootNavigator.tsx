@@ -1,5 +1,7 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { RootStackParamList, TabParamList } from './types';
+import RestaurantScreen from '../screens/restaurant/RestaurantScreen';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import HomeScreen from '../screens/tabs/HomeScreen';
@@ -7,8 +9,8 @@ import SearchScreen from '../screens/tabs/SearchScreen';
 import OrdersScreen from '../screens/tabs/OrdersScreen';
 import ProfileScreen from '../screens/tabs/ProfileScreen';
 
-const Tab = createBottomTabNavigator();
-const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator<TabParamList>();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function TabNavigator() {
   return (
@@ -69,6 +71,10 @@ export default function RootNavigator() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Tabs" component={TabNavigator} />
+      <Stack.Screen 
+        name="Restaurant" 
+        component={RestaurantScreen}
+        options={{headerShown:true}} />
     </Stack.Navigator>
   );
 }
