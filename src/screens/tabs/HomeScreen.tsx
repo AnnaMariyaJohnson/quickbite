@@ -62,14 +62,13 @@ export default function HomeScreen() {
           <Text className="text-white text-xl font-semibold mb-4">Popular near you</Text>
           {mockRestaurants.map((restaurant)=>(
             <RestaurantCard
-              key={restaurant.id}
+              id={restaurant.id}
               name={restaurant.name}
               image={restaurant.image}
               cuisine={restaurant.cuisine}
               rating={restaurant.rating}
               time={restaurant.time}
-              deliveryFee={restaurant.deliveryFee}
-              onPress={()=> console.log('pressed:',restaurant.name)}/>
+              deliveryFee={restaurant.deliveryFee}/>
           ))}
         </View>
       </ScrollView>

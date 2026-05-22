@@ -24,6 +24,7 @@ export type TabParamList={
     Search:undefined;
     Orders:undefined;
     Profile:undefined;
+    Cart:undefined;
 }
 
 export type RestaurantScreenProps=NativeStackScreenProps<RootStackParamList,'Restaurant'>;

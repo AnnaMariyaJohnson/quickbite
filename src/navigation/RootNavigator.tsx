@@ -8,6 +8,8 @@ import HomeScreen from '../screens/tabs/HomeScreen';
 import SearchScreen from '../screens/tabs/SearchScreen';
 import OrdersScreen from '../screens/tabs/OrdersScreen';
 import ProfileScreen from '../screens/tabs/ProfileScreen';
+import CartScreen from '../screens/tabs/CartScreen';
+import { useCartStore } from  '../store/cartStore';
 
 const Tab = createBottomTabNavigator<TabParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -45,6 +47,18 @@ function TabNavigator() {
           ),
         }}
       />
+      <Tab.Screen
+        name="Cart"
+        component={CartScreen}
+        options={{
+          tabBarIcon:({color,size})=>(
+            <Icon name="shopping-cart" size={size} color={color}/>
+          ),
+          tabBarBadge:useCartStore.getState().totalItems>0
+          ? useCartStore.getState().totalItems
+          :undefined,
+        }}
+        />
       <Tab.Screen
         name="Orders"
         component={OrdersScreen}
