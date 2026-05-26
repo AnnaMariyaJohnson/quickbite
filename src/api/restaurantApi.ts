@@ -58,7 +58,38 @@ const mockMenus:Record<string,MenuItem[]>={
     },
   ],
   '2': [
-    // Add more items for Pizza Hut if you want
+    {
+      id: '5',
+      restaurantId: '2',
+      name: 'Margherita Pizza',
+      price: 249,
+      description: 'Classic cheese pizza with fresh basil',
+      isVeg: true,
+    },
+    {
+      id: '6',
+      restaurantId: '2',
+      name: 'Pepperoni Pizza',
+      price: 329,
+      description: 'Spicy pepperoni with mozzarella cheese',
+      isVeg: false,
+    },
+    {
+      id: '7',
+      restaurantId: '2',
+      name: 'Garlic Bread',
+      price: 149,
+      description: 'Crispy garlic bread with cheese',
+      isVeg: true,
+    },
+    {
+      id: '8',
+      restaurantId: '2',
+      name: 'Veg Pasta',
+      price: 219,
+      description: 'Penne pasta in creamy tomato sauce',
+      isVeg: true,
+    },
   ],
 }
 

@@ -1,14 +1,16 @@
-import { View, Text, ScrollView, Image, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, Image, TouchableOpacity, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import RestaurantCard from '../../components/restaurant/RestaurantCard' ;
 import { restaurantApi } from '../../api/restaurantApi';
 import {Restaurant} from '../../types/index';
 import { useEffect, useState } from 'react';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 
 export default function HomeScreen() {
   const [restaurants,setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing,setReferesing] = useState(false);
 
   useEffect(()=>{
     fetchRestaurants();
@@ -25,9 +27,19 @@ export default function HomeScreen() {
     }
   };
 
+  const onRefersh= async()=>{
+    setReferesing(true);
+    await fetchRestaurants();
+    setReferesing(false);
+  }
+
   return (
     <SafeAreaView className="flex-1 bg-zinc-950">
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefersh} colors={['#FF3DOO']}/>
+            }
+       >
         {/* Header */}
         <View className="px-4 pt-4">
           <Text className="text-white text-3xl font-bold">QuickBite</Text>
@@ -37,7 +49,7 @@ export default function HomeScreen() {
         {/* Search Bar */}
         <View className="px-4 mt-6">
           <View className="bg-zinc-900 rounded-2xl px-4 py-3 flex-row items-center">
-            <Text className="text-zinc-500">🔍</Text>
+            <Icon name ="search" size={28} color='#71717a' />
             <Text className="text-zinc-400 ml-3">Search restaurants and dishes...</Text>
           </View>
         </View>

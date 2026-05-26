@@ -1,21 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import {View,Text,ScrollView,Image,TouchableOpacity} from 'react-native';
+import {View,Text,ScrollView,Image,TouchableOpacity, RefreshControl} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCartStore } from  '../../store/cartStore';
-import { RestaurantScreenProps } from '../../navigation/types';
+import { RestaurantScreenProps, RootStackParamList } from '../../navigation/types';
 import {restaurantApi} from '../../api/restaurantApi';
 import {MenuItem} from '../../types/index';
-
-
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 
 export default function RestaurantScreen({route}:RestaurantScreenProps){
     const { restaurant } = route.params;
+    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const addToCart=useCartStore((state)=>state.addToCart);
     const cartItems=useCartStore((state)=>state.items);
 
     const [menu,setMenu] = useState<MenuItem[]>([]);
     const[loading,setLoading] = useState(true);
+    const[refreshing ,setRefreshing]=useState(false);
 
     //Fetch menu when screen loads
     useEffect(()=>{
@@ -31,6 +34,12 @@ export default function RestaurantScreen({route}:RestaurantScreenProps){
         }finally{
             setLoading(false);
         }
+    };
+
+    const onRefresh=async () =>{
+        setRefreshing(true);
+        await fetchMenu();
+        setRefreshing(false);
     };
 
     const handleAddToCart=(item:MenuItem)=>{
@@ -50,7 +59,26 @@ export default function RestaurantScreen({route}:RestaurantScreenProps){
     };
     return(
         <SafeAreaView className='flex-1 bg-zinc-950'>
-            <ScrollView showsVerticalScrollIndicator={false}>
+            {/* Custom Header */}
+      <View className="flex-row items-center  px-4 py-4 bg-zinc-950 border-b border-zinc-800">
+        <TouchableOpacity 
+          onPress={() => navigation.goBack()}
+          className="p-2"
+        >
+          <Icon name="arrow-back" size={28} color="#ffffff" />
+        </TouchableOpacity>        
+        <Text className="text-white text-xl font-semibold">Restaurant</Text>        
+        <View style={{ width: 28 }} />   {/* Empty space for balance */}
+      </View>
+            <ScrollView 
+            showsVerticalScrollIndicator={false}
+            refreshControl={
+                <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                    colors={['#FF3D00']}
+                />
+            }>
                 {/*Restaurant header image */}
                 <Image
                     source={{uri:restaurant.image}}
@@ -100,10 +128,6 @@ export default function RestaurantScreen({route}:RestaurantScreenProps){
                         )))}
                     </View>
             </ScrollView>
-
-            <View className="absolute bottom-20 right-4 bg-black/70 px-4 py-2 rounded-full">
-                <Text className="text-white">Cart Items: {cartItems.length}</Text>
-            </View>
         </SafeAreaView>
     )
 }
