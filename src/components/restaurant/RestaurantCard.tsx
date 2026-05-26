@@ -10,7 +10,7 @@ type RestaurantCardProps={
     cuisine:string;
     rating:number;
     time:string;
-    deliveryFee:string;
+    deliveryFee:string | number;
 };
 
 type RestaurantNavigationProp=NativeStackNavigationProp<RootStackParamList, 'Restaurant'>

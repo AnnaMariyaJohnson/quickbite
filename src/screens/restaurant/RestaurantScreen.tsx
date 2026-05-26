@@ -1,53 +1,37 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {View,Text,ScrollView,Image,TouchableOpacity} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCartStore } from  '../../store/cartStore';
 import { RestaurantScreenProps } from '../../navigation/types';
+import {restaurantApi} from '../../api/restaurantApi';
+import {MenuItem} from '../../types/index';
 
-type MenuItem={
-    id:string;
-    name:string;
-    price:number;
-    description?:string;
-    image?:string;
-    isVeg?:boolean;
-}
 
-const mockMenu:MenuItem[]=[
-    {
-        id:'1',
-        name:'Butter Chicken',
-        price:289,
-        description:'Tender chicken in rich tomato gravy',
-        isVeg:false,
-    },
-    {
-        id:'2',
-        name:'Panner Butter Masala',
-        price:259,
-        description:'Cottage cheese in creamy gravy',
-        isVeg:true,
-    },
-    {
-    id: '3',
-    name: 'Hyderabadi Biryani',
-    price: 349,
-    description: 'Fragrant basmati rice with spices and meat',
-    isVeg: false,
-  },
-  {
-    id: '4',
-    name: 'Veg Fried Rice',
-    price: 199,
-    description: 'Stir fried rice with vegetables and soy sauce',
-    isVeg: true,
-  },
-];
+
 
 export default function RestaurantScreen({route}:RestaurantScreenProps){
     const { restaurant } = route.params;
     const addToCart=useCartStore((state)=>state.addToCart);
     const cartItems=useCartStore((state)=>state.items);
+
+    const [menu,setMenu] = useState<MenuItem[]>([]);
+    const[loading,setLoading] = useState(true);
+
+    //Fetch menu when screen loads
+    useEffect(()=>{
+        fetchMenu();
+    },[restaurant.id]);
+
+    const fetchMenu= async()=>{
+        try{
+            const data=await restaurantApi.getMenu(restaurant.id);
+            setMenu(data);
+        }catch(error){
+            console.error('Failed to load menu:',error);
+        }finally{
+            setLoading(false);
+        }
+    };
 
     const handleAddToCart=(item:MenuItem)=>{
         addToCart(
@@ -89,7 +73,12 @@ export default function RestaurantScreen({route}:RestaurantScreenProps){
 
                         {/*Menu section*/}
                         <Text className='text-white text-2xl font-semibold mt-8 mb-4'>Menu</Text>
-                        {mockMenu.map((item)=>(
+                        {loading ?(
+                            <Text className='text-zinc-400 text-center py-12'>Loading menu items...</Text>
+                        ):menu.length===0?(
+                            <Text className='text-zinc-400 text-center py-12'>No menu items available</Text>
+                        ):(
+                            menu.map((item)=>(
                             <View
                                 key={item.id}
                                 className='bg-zinc-900 rounded-2xl p-4 flex-row items-center'>
@@ -108,7 +97,7 @@ export default function RestaurantScreen({route}:RestaurantScreenProps){
                                             <Text className='text-white font-semibold'>Add</Text>
                                     </TouchableOpacity>
                             </View>
-                        ))}
+                        )))}
                     </View>
             </ScrollView>
 

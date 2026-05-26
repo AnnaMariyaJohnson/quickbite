@@ -3,18 +3,18 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "src/*"
-      ]
+      "@/*": ["src/*"]
     },
-    "ignoreDeprecations": "6.0"
+    "ignoreDeprecations": "6.0",
+    "types": ["react-native-dotenv", "node"]   // ← Add "node" too if needed
   },
   "include": [
     "src/**/*",
     "App.tsx",
     "**/*.ts",
     "**/*.tsx",
-    "nativewind-env.d.ts"
+    "nativewind-env.d.ts",
+    "src/types/env.d.ts"     // ← Make sure this is included
   ],
   "exclude": [
     "node_modules",

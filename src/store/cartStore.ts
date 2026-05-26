@@ -9,7 +9,7 @@ export type CartItem={
     image?:string;
 }
 
-type cartStore={
+type CartStore={
     items:CartItem[];
     restaurantId:string | null;
     addToCart:(item:Omit<CartItem,'quantity'>,restaurantId:string)=>void;
@@ -21,7 +21,7 @@ type cartStore={
     totalPrice:number;
 };
 
-export const useCartStore =create<cartStore>((set,get)=>({
+export const useCartStore =create<CartStore>((set,get)=>({
     items:[],
     restaurantId:null,
     addToCart:(item,restaurantId)=>{

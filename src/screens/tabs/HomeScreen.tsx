@@ -1,30 +1,30 @@
 import { View, Text, ScrollView, Image, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import RestaurantCard from '../../components/restaurant/RestaurantCard' ;
-import {COLORS} from '../../constants/colors';
+import { restaurantApi } from '../../api/restaurantApi';
+import {Restaurant} from '../../types/index';
+import { useEffect, useState } from 'react';
 
-const mockRestaurants=[
-  {
-    id: '1',
-    name: 'Meghana Foods',
-    image: 'https://picsum.photos/id/1080/600/300',
-    cuisine: 'Biryani • North Indian • ₹₹',
-    rating: 4.6,
-    time: '25-30 mins',
-    deliveryFee: 'Free delivery',
-  },
-  {
-    id: '2',
-    name: 'Pizza Hut',
-    image: 'https://picsum.photos/id/201/600/300',
-    cuisine: 'Pizza • Italian • ₹₹',
-    rating: 4.3,
-    time: '20-25 mins',
-    deliveryFee: '₹30 delivery',
-  },
-]
 
 export default function HomeScreen() {
+  const [restaurants,setRestaurants] = useState<Restaurant[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(()=>{
+    fetchRestaurants();
+  },[]);
+
+  const fetchRestaurants = async ()=>{
+    try{
+      const data = await restaurantApi.getAll();
+      setRestaurants(data);
+    }catch(error){
+      console.error('Failed to fetch restaurants:',error);
+    }finally{
+      setLoading(false);
+    }
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-zinc-950">
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -60,8 +60,12 @@ export default function HomeScreen() {
         {/* Popular Restaurants */}
         <View className="px-4 mt-8 mb-8">
           <Text className="text-white text-xl font-semibold mb-4">Popular near you</Text>
-          {mockRestaurants.map((restaurant)=>(
+            {loading ?(
+              <Text className='text-zinc-400 text-center py-10'>Loading Restaurants...</Text>
+            ):(
+              restaurants.map((restaurant)=>(
             <RestaurantCard
+              key={restaurant.id}
               id={restaurant.id}
               name={restaurant.name}
               image={restaurant.image}
@@ -69,7 +73,9 @@ export default function HomeScreen() {
               rating={restaurant.rating}
               time={restaurant.time}
               deliveryFee={restaurant.deliveryFee}/>
-          ))}
+              ))
+            )}
+          
         </View>
       </ScrollView>
     </SafeAreaView>

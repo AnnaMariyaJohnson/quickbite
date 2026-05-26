@@ -14,7 +14,7 @@ export type RootStackParamList={
             cuisine:string;
             rating:number;
             time:string;
-            deliveryFee:string;
+            deliveryFee:string | number;
         };
     };
 }
