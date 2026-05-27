@@ -54,7 +54,7 @@ function TabNavigator() {
           ),
           tabBarBadge: totalItems > 0 ? totalItems : undefined,
           tabBarBadgeStyle: {
-            backgroundColor: '#FF3D00',
+            backgroundColor: '#ef4444',
             color: 'white',
             fontSize: 12,
             fontWeight: 'bold',

@@ -68,7 +68,6 @@ export default function RestaurantScreen({route}:RestaurantScreenProps){
           <Icon name="arrow-back" size={28} color="#ffffff" />
         </TouchableOpacity>        
         <Text className="text-white text-xl font-semibold">Restaurant</Text>        
-        <View style={{ width: 28 }} />   {/* Empty space for balance */}
       </View>
             <ScrollView 
             showsVerticalScrollIndicator={false}

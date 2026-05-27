@@ -21,48 +21,84 @@ type CartStore={
     totalPrice:number;
 };
 
-export const useCartStore =create<CartStore>((set,get)=>({
+export const useCartStore=create<CartStore>((set,get)=>({
     items:[],
     restaurantId:null,
+    totalItems:0,
+    totalPrice:0,
+
     addToCart:(item,restaurantId)=>{
         const {items,restaurantId:currentRestId}=get();
-        // clear cart if switching restaurant
+
+        //clear cart if switching restaurant
         if(currentRestId && currentRestId !== restaurantId){
             set({items:[],restaurantId});
         }
-        const existingIndex =items.findIndex(i=>i.id === item.id);
-        if(existingIndex !== -1){
-            const updatedItems =[...items];
-            updatedItems[existingIndex].quantity += 1;
-            set({items:updatedItems});
-        }else{
-            set({
-                items:[...items, {...item,quantity:1}],
-                restaurantId,
-            });
-        }
-    },
-    removeFromCart:(id)=>
-        set((state)=>({
-            items:state.items.filter((item)=>item.id !== id),
-        })),
-    increaseQuantity:(id)=>
-        set((state)=>({
-            items:state.items.map((item)=>
-            item.id===id ? { ...item, quantity:item.quantity+1}:item),
-        })),
-    decreaseQuantity:(id)=>
-        set((state)=>({
-            items:state.items.map((item)=>
-            item.id===id ?{ ...item,quantity:item.quantity -1}:item)
-            .filter((item)=>item.quantity>0),
-        })),
-    clearCart:()=>set({items:[],restaurantId:null}),
-    get totalItems(){
-        return get().items.reduce((sum,item)=>sum+item.quantity,0);
-    },
-    get totalPrice(){
-        return get().items.reduce((sum,item)=> sum + item.price * item.quantity,0);
-    },
 
-}));
+        const existingItem=items.findIndex(i=>i.id===item.id);
+
+        let newItems:CartItem[];
+        if(existingItem !== -1){
+          newItems=[...items];
+            newItems[existingItem].quantity +=1;
+        }else{
+            newItems=[...items,{...item,quantity:1}];
+        }  
+        const newTotalItems=newItems.reduce((sum,i)=>sum+i.quantity,0);
+        const newTotalPrice=newItems.reduce((sum,i)=>sum+i.price*i.quantity,0);
+
+        set({
+            items:newItems,
+            restaurantId,
+            totalItems:newTotalItems,
+            totalPrice:newTotalPrice,
+        });
+    },
+    removeFromCart:(id)=>{
+        const newItems=get().items.filter(i=>i.id!==id);
+        const newTotalItems=newItems.reduce((sum,i)=>sum+i.quantity,0);
+        const newTotalPrice=newItems.reduce((sum,i)=>sum+i.price*i.quantity,0);
+
+        set({
+            items:newItems,
+            totalItems:newTotalItems,
+            totalPrice:newTotalPrice,
+        });
+    },
+    decreaseQuantity:(id)=>{
+        const newItems=get().items.map(item=>
+            item.id === id ? {...item,quantity:item.quantity-1} : item
+        ).filter(i=>i.quantity>0);
+
+        const newTotalItems=newItems.reduce((sum,i)=>sum+i.quantity,0);
+        const newTotalPrice=newItems.reduce((sum,i)=>sum+i.price*i.quantity,0);
+
+        set({
+            items:newItems,
+            totalItems:newTotalItems,
+            totalPrice:newTotalPrice,
+        });
+    },
+    increaseQuantity:(id)=>{
+        const newItems=get().items.map(item=>
+            item.id === id ? {...item,quantity:item.quantity+1} : item
+        );
+
+        const newTotalItems=newItems.reduce((sum,i)=>sum+i.quantity,0);
+        const newTotalPrice=newItems.reduce((sum,i)=>sum+i.price*i.quantity,0);
+
+        set({
+            items:newItems,
+            totalItems:newTotalItems,
+            totalPrice:newTotalPrice,
+        });
+    },
+    clearCart:()=>{
+        set({
+            items:[],
+            restaurantId:null,
+            totalItems:0,
+            totalPrice:0,
+        });
+    },
+        }));

@@ -7,19 +7,13 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/types';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-type CartNavigationProp = NativeStackNavigationProp<RootStackParamList>;
-
 export default function CartScreen() {
-  const { items, removeFromCart, increaseQuantity, decreaseQuantity } =
-    useCartStore();
-  const totalItems = useCartStore((state)=>
-    state.items.reduce((sum,item)=>sum+item.quantity,0));
-  const totalPrice = useCartStore((state)=>
-    state.items.reduce((sum,item)=>sum+item.price*item.quantity,0));
+  const { items, removeFromCart, increaseQuantity, decreaseQuantity } = useCartStore();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  const navigation = useNavigation<CartNavigationProp>();
+  const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
 
-  // Empty Cart State
   if (items.length === 0) {
     return (
       <SafeAreaView className="flex-1 bg-zinc-950">
@@ -33,7 +27,6 @@ export default function CartScreen() {
           <TouchableOpacity
             onPress={() => navigation.navigate('Tabs', { screen: 'Home' })}
             className="bg-orange-600 px-10 py-4 rounded-2xl mt-10 w-full max-w-[300px]"
-            activeOpacity={0.8}
           >
             <Text className="text-white font-semibold text-xl text-center">
               Browse Restaurants
@@ -61,6 +54,7 @@ export default function CartScreen() {
               key={item.id}
               className="bg-zinc-900 rounded-3xl p-4 flex-row"
             >
+              {/* Image */}
               {item.image && (
                 <Image
                   source={{ uri: item.image }}
@@ -69,36 +63,30 @@ export default function CartScreen() {
                 />
               )}
 
+              {/* Details */}
               <View className="flex-1">
-                <Text className="text-white text-lg font-semibold leading-tight">
-                  {item.name}
-                </Text>
-                <Text className="text-orange-500 font-bold text-2xl mt-1">
-                  ₹{item.price}
-                </Text>
+                <Text className="text-white text-lg font-semibold">{item.name}</Text>
+                <Text className="text-orange-500 font-bold text-2xl mt-1">₹{item.price}</Text>
 
-                {/* Quantity Controls - Improved Visibility */}
+                {/* Quantity Controls */}
                 <View className="flex-row items-center mt-4 bg-zinc-800 rounded-2xl p-1 w-fit">
                   <TouchableOpacity
                     onPress={() => decreaseQuantity(item.id)}
-                    className="w-10 h-10 items-center justify-center rounded-xl active:bg-zinc-700"
+                    className="w-10 h-10 items-center justify-center"
                   >
                     <Text className="text-white text-2xl font-bold text-orange-400">-</Text>
                   </TouchableOpacity>
-
-                  <Text className="text-white font-semibold text-xl px-6">
-                    {item.quantity}
-                  </Text>
-
+                  <Text className="text-white font-semibold text-xl px-6">{item.quantity}</Text>
                   <TouchableOpacity
                     onPress={() => increaseQuantity(item.id)}
-                    className="w-10 h-10 items-center justify-center rounded-xl active:bg-zinc-700"
+                    className="w-10 h-10 items-center justify-center"
                   >
                     <Text className="text-white text-2xl font-bold text-orange-400">+</Text>
                   </TouchableOpacity>
                 </View>
               </View>
 
+              {/* Delete Button */}
               <TouchableOpacity
                 onPress={() => removeFromCart(item.id)}
                 className="p-2 -mt-1"
@@ -123,7 +111,7 @@ export default function CartScreen() {
           onPress={() => {
             Alert.alert(
               "Checkout",
-              `Total amount: ₹${totalPrice}\n\nProceeding to checkout...`,
+              `Total amount: ₹${totalPrice}\n\nProceeding to checkout... (Mock)`,
               [
                 { text: "Cancel", style: "cancel" },
                 { text: "Continue", onPress: () => console.log("Checkout started") }
@@ -131,9 +119,7 @@ export default function CartScreen() {
             );
           }}
         >
-          <Text className="text-white font-semibold text-xl">
-            Proceed to Checkout
-          </Text>
+          <Text className="text-white font-semibold text-xl">Proceed to Checkout</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
