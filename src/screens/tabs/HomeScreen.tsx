@@ -1,5 +1,5 @@
 // src/screens/tabs/HomeScreen.tsx
-import React, { useEffect, useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, RefreshControl, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -9,6 +9,7 @@ import RestaurantCard from '../../components/restaurant/RestaurantCard';
 import { restaurantApi } from '../../api/restaurantApi';
 import { Restaurant } from '../../types/index';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useAuthStore } from '../../store/authStore';
 
 export default function HomeScreen() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
@@ -16,7 +17,8 @@ export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
 
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-
+  const { user } =useAuthStore();
+  
   useEffect(()=>{
     fetchRestaurants();
   },[]);
@@ -51,7 +53,7 @@ export default function HomeScreen() {
         {/* Header */}
         <View className="px-4 pt-4">
           <Text className="text-white text-3xl font-bold">QuickBite</Text>
-          <Text className="text-zinc-400 text-lg">Good evening, Anna 👋</Text>
+          <Text className="text-zinc-400 text-lg">Good evening,{user?.name|| user?.email?.split('@')[0] ||'Guest'} 👋</Text>
         </View>
 
         {/* Clickable Search Bar */}

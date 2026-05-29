@@ -11,6 +11,12 @@ import ProfileScreen from '../screens/tabs/ProfileScreen';
 import CartScreen from '../screens/tabs/CartScreen';
 import { useCartStore } from '../store/cartStore';
 
+import LoginScreen  from '../screens/auth/LoginScreen';
+import RegisterScreen from '../screens/auth/RegisterScreen';
+import { useAuthStore } from '../store/authStore';
+import { Activity, use, useEffect } from 'react';
+import { ActivityIndicator, View } from 'react-native';
+
 const Tab = createBottomTabNavigator<TabParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -80,9 +86,29 @@ function TabNavigator() {
 }
 
 export default function RootNavigator() {
+   const {isAuthenticated,isLoading,loadStoredUser} = useAuthStore();
+
+   useEffect(()=>{
+    loadStoredUser();
+   },[]);
+   
+   if(isLoading){
+    return(
+      <View className='flex-1 justify-center items-center'>
+        <ActivityIndicator size='large' color='#FF3D00' />
+      </View>
+    )
+   }
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Tabs" component={TabNavigator} />
+      {!isAuthenticated ? (
+        <>
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="Register" component={RegisterScreen} />
+        </>
+      ) : (
+        <Stack.Screen name="Tabs" component={TabNavigator} />
+      )}
       <Stack.Screen
         name="Restaurant"
         component={RestaurantScreen}

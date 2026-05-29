@@ -17,6 +17,12 @@ export type RootStackParamList={
             deliveryFee:string | number;
         };
     };
+    Login:undefined;
+    Register:undefined;
+    Checkout:undefined;
+    OrderDetails:{
+        orderId:string;
+    };
 }
 
 export type TabParamList={

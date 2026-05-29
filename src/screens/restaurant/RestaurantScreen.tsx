@@ -111,7 +111,11 @@ export default function RestaurantScreen({route}:RestaurantScreenProps){
                                 className='bg-zinc-900 rounded-2xl p-4 flex-row items-center'>
                                     <View className='flex-1'>
                                         <View className='flex-row items-center gap-2'>
-                                            <Text className='text-lg'>{item.isVeg ? '🟢' : '🔴'}</Text>
+                                            <Icon
+                                                name={item.isVeg ? "eco" : "whatshot"}
+                                                size={22}
+                                                color={item.isVeg ? "#22c55e" : "#ef4444"}
+                                                />
                                             <Text className='text-white text-lg font-semibold flex-1'>{item.name}</Text>
                                         </View>
                                         <Text className='text-zinc-400 text-sm mt-1'>{item.description}</Text>

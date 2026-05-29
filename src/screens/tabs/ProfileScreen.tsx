@@ -1,39 +1,87 @@
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import React from 'react';
+import { View, Text, TouchableOpacity, ScrollView ,Alert} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useAuthStore } from '../../store/authStore';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useNavigation,NavigationProp } from '@react-navigation/native';
+import { RootStackParamList } from '../../navigation/types';;
+
+type ProfileScreenNavigationProp = NavigationProp<RootStackParamList>;
 
 export default function ProfileScreen() {
+  const {user,logout,isAuthenticated}=useAuthStore();
+  const navigation=useNavigation<ProfileScreenNavigationProp>();
+
+  const handleLogout=()=>{
+    Alert.alert('Logout','Are you sure you want to logout?',[
+      {text:'Cancel',style:'cancel'},
+      {
+        text:'Logout',style:'destructive',onPress: async ()=>{
+          await logout();
+          navigation.reset({
+            index:0,
+            routes:[{name:'Login'}],
+          });
+        },
+      },
+    ]);
+  };
+  //If user is not logged in
+  if(!isAuthenticated || !user){
+    return(
+      <SafeAreaView className="flex-1 bg-zinc-950 justify-center items-center px-6">
+        <Icon name="person-off" size={90} color="#3f3f46" />
+        <Text className="text-white text-2xl font-semibold mt-8">Not Logged In</Text>
+        <Text className="text-zinc-400 text-center mt-3 mb-10">
+          Login to view your profile and orders
+        </Text>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('Login' as never)}
+          className="bg-orange-600 px-12 py-4 rounded-2xl"
+        >
+          <Text className="text-white text-lg font-semibold">Login / Sign Up</Text>
+        </TouchableOpacity>
+      </SafeAreaView>
+    );
+  }
+
+  //Logged in user view
   return (
     <SafeAreaView className="flex-1 bg-zinc-950">
       <ScrollView className="flex-1">
         {/* Profile Header */}
         <View className="items-center pt-10 pb-8 bg-zinc-900">
           <View className="w-24 h-24 bg-zinc-700 rounded-full items-center justify-center mb-4">
-            <Text className="text-4xl">👩‍🍳</Text>
+            <Icon name="person" size={60} color="#f3f4f6" />
           </View>
-          <Text className="text-white text-2xl font-bold">Anna Mariya</Text>
-          <Text className="text-zinc-400">anna@example.com</Text>
+          <Text className="text-white text-2xl font-bold">{user.name}</Text>
+          <Text className="text-zinc-400">{user.email}</Text>
         </View>
 
         <View className="px-4 mt-6">
           {/* Menu Items */}
           {[
-            { title: 'My Addresses', icon: '📍' },
-            { title: 'Payment Methods', icon: '💳' },
-            { title: 'Favorites', icon: '❤️' },
-            { title: 'Order History', icon: '📜' },
-            { title: 'Notifications', icon: '🛎️' },
-            { title: 'Help & Support', icon: '❓' },
-            { title: 'Dark Mode', icon: '🌙' },
+            { title: 'My Addresses', icon: 'location-on' },
+            { title: 'Payment Methods', icon: 'payment' },
+            { title: 'Favorites', icon: 'favorite' },
+            { title: 'Order History', icon: 'history' },
+            { title: 'Notifications', icon: 'notifications' },
+            { title: 'Help & Support', icon: 'help-outline' },
           ].map((item, i) => (
-            <TouchableOpacity key={i} className="flex-row items-center py-5 border-b border-zinc-800">
-              <Text className="text-2xl mr-4">{item.icon}</Text>
+            <TouchableOpacity key={i} className="flex-row items-center py-5 border-b border-zinc-800"
+            onPress={()=>{
+              if(item.title==='Order History'){
+                navigation.navigate('Tabs',{screen:'Orders'});
+              }
+            }}>
+              <Icon name={item.icon} size={28} color="#71717a" />
               <Text className="text-white text-lg flex-1">{item.title}</Text>
-              <Text className="text-zinc-500 text-xl">›</Text>
+              <Icon name="chevron-right" size={28} color="#71717a" />
             </TouchableOpacity>
           ))}
 
           {/* Logout */}
-          <TouchableOpacity className="mt-10 py-4">
+          <TouchableOpacity className="mt-10 py-4" onPress={handleLogout}>
             <Text className="text-red-500 text-center text-lg font-semibold">Logout</Text>
           </TouchableOpacity>
         </View>
