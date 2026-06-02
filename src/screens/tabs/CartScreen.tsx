@@ -109,14 +109,7 @@ export default function CartScreen() {
           className="bg-orange-600 py-4 rounded-2xl items-center"
           activeOpacity={0.8}
           onPress={() => {
-            Alert.alert(
-              "Checkout",
-              `Total amount: ₹${totalPrice}\n\nProceeding to checkout... (Mock)`,
-              [
-                { text: "Cancel", style: "cancel" },
-                { text: "Continue", onPress: () => console.log("Checkout started") }
-              ]
-            );
+            navigation.navigate('Checkout');
           }}
         >
           <Text className="text-white font-semibold text-xl">Proceed to Checkout</Text>

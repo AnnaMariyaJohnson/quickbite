@@ -55,6 +55,9 @@ export const useAuthStore=create<AuthState>((set,get)=>({
     //     }
     // },
 
+        // TODO:
+    // Replace mock login with authApi.login()
+    // after verifying backend response.
     // === MOCK LOGIN HANDLER (Temporary) ===
    login: async (email: string, password: string) => {
     try {

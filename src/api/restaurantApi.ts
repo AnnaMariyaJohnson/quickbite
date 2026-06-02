@@ -1,4 +1,5 @@
 import { Restaurant,MenuItem } from "../types/index";
+import api from './axios';
 
 //Mock data('we'll replace this later with real API calls)
 const mockRestaurants:Restaurant[]=[
@@ -98,6 +99,14 @@ export const restaurantApi={
         //simulate network delay
         await new Promise(resolve=>setTimeout(resolve,800));
         return mockRestaurants;
+    },
+    // getAll:async()=>{
+    //   const response=await api.get('/restaurant');
+    //   return response.data;
+    // },
+    getById:async(id:string)=>{
+      const response=await api.get(`/restaurant/${id}`);
+      return response.data;
     },
 
     getMenu:async(restaurantId:string):Promise<MenuItem[]>=>{
