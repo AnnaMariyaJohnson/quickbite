@@ -1,22 +1,23 @@
 import {create} from 'zustand';
-import { CartItem } from './cartStore';
-
-type Order={
-    id:string;
-    total:number;
-    date:string;
-    items:CartItem[];
-};
+import {Order} from '../types/order';
+import {persist, createJSONStorage} from 'zustand/middleware';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type OrderState={
     orders:Order[];
     addOrder:(order:Order)=>void;
 }
 
-export const useOrderStore=create<OrderState>((set)=>({
+export const useOrderStore=create<OrderState>()(
+    persist((set)=>({
     orders:[],
     addOrder:(order)=>
         set((state)=>({
             orders:[order,...state.orders],
-        }))
-}));
+        })),
+}),
+{
+    name:'order-storage',
+    storage:createJSONStorage(()=>AsyncStorage),
+})
+);
