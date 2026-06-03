@@ -1,6 +1,7 @@
 import {create} from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../api/axios';
+import { authApi } from '../api/authApi';
 
 type User={
     id:string;
@@ -37,57 +38,34 @@ export const useAuthStore=create<AuthState>((set,get)=>({
     isLoading:true,
     isAuthenticated:false,
 
-    // login:async(email:string,password:string)=>{
-    //     try{
-    //         const response=await api.post('/auth/login',{email,password});
-    //         const {token,user}=response.data;
-    //         await AsyncStorage.setItem('authToken',token);
-    //         api.defaults.headers.common['Authorization']=`Bearer ${token}`;
-    //         set({
-    //             user,
-    //             token,
-    //             isAuthenticated:true,
-    //         });
-    //     } catch(error){
-    //         const err= error as ApiError;
-    //         console.error('Login Error:',err.response?.data || err.message);
-    //         throw err;
-    //     }
-    // },
+    login:async(email:string,password:string)=>{
+        try{
+            const loginResponse=await authApi.login(
+                email,
+                password,
+            );
+            const token=loginResponse.token;
+            await AsyncStorage.setItem('authToken',token);
 
-        // TODO:
-    // Replace mock login with authApi.login()
-    // after verifying backend response.
-    // === MOCK LOGIN HANDLER (Temporary) ===
-   login: async (email: string, password: string) => {
-    try {
-        await new Promise(resolve => setTimeout(resolve, 800)); // Simulate delay
+            api.defaults.headers.common['Authorization']=`Bearer ${token}`;
 
-        // Mock user with better name handling
-        const mockUser: User = {
-        id: 'user_' + Date.now().toString(),
-        name: email.includes('@') 
-            ? email.split('@')[0].charAt(0).toUpperCase() + email.split('@')[0].slice(1) 
-            : 'User',
-        email: email.toLowerCase(),
-        phone: '9876543210',
-        };
-
-        const mockToken = 'mock-jwt-token-' + Date.now();
-
-        await AsyncStorage.setItem('authToken', mockToken);
-        api.defaults.headers.common['Authorization'] = `Bearer ${mockToken}`;
-
-        set({
-        user: mockUser,
-        token: mockToken,
-        isAuthenticated: true,
-        });
-    } catch (error) {
-        console.error('Login Error:', error);
-        throw error;
-    }
+            const meResponse=await api.get('/auth/me');
+            const user:User={
+                id:meResponse.data.userId,
+                name:meResponse.data.fullName,
+                email:meResponse.data.email,
+            };
+            set({
+                user,
+                token,
+                isAuthenticated:true,
+            });
+        }catch(error){
+            console.error('Login failed:',error);
+            throw error;
+        }
     },
+
     logout:async()=>{
         try{
             await AsyncStorage.removeItem('authToken');
@@ -112,8 +90,13 @@ export const useAuthStore=create<AuthState>((set,get)=>({
             }
             api.defaults.headers.common['Authorization']=`Bearer ${token}`;
             const response=await api.get('/auth/me');
+            const  user:User={
+                id:response.data.userId,
+                name:response.data.fullName,
+                email:response.data.email,
+            };
             set({
-                user:response.data,
+                user,
                 token,
                 isAuthenticated:true,
             });

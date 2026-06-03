@@ -1,14 +1,14 @@
 // src/screens/tabs/SearchScreen.tsx
-import React, { useState, useEffect, use } from 'react';
-import { View, Text, TextInput, ScrollView, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect, } from 'react';
+import { View, Text, TextInput, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/types';
 import { restaurantApi } from '../../api/restaurantApi';
+import {menuApi} from '../../api/menuApi';
 import { MenuItem, Restaurant } from '../../types';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { resourceLimits } from 'node:worker_threads';
 
 type SearchResult={
   type:'restaurant' | 'dish';
@@ -59,14 +59,12 @@ export default function SearchScreen() {
     const processedRestaurants=new Set<string>();
 
     restaurants.forEach(restaurant=>{
-      let matched=false;
+      
       if(
         restaurant.name.toLowerCase().includes(query) ||
-        restaurant.cuisine.toLowerCase().includes(query)
+        restaurant.description.toLowerCase().includes(query)
       ){
-        results.push({type:'restaurant',restaurant});
-        matched=true;
-        processedRestaurants.add(restaurant.id);
+        results.push({type:'restaurant',restaurant});       
       }
       // Search in menu items 
       const restaurantMenu=menus[restaurant.id];
@@ -81,7 +79,6 @@ export default function SearchScreen() {
               restaurant,
               dish
             });
-            matched=true;
           }
         })
       }    
@@ -94,7 +91,7 @@ export default function SearchScreen() {
     if(menus[restaurantId]) return; //Already fetched
     try{
       setSearching(true);
-      const menuItems=await restaurantApi.getMenu(restaurantId);
+      const menuItems=await menuApi.getByRestaurantId(restaurantId);
       setMenus(prev=>({...prev,[restaurantId]:menuItems}));
     } catch (error) {
       console.error('Failed to fetch menu for restaurant:', error);
@@ -112,7 +109,13 @@ export default function SearchScreen() {
   },[searchText])
 
   const handlePress = (result: SearchResult) => {
-    navigation.navigate('Restaurant', { restaurant:result.restaurant });
+    navigation.navigate('Restaurant', { 
+      restaurant:{
+        id:result.restaurant.id,
+        name:result.restaurant.name,
+        address:result.restaurant.address,
+        description:result.restaurant.description,
+      } });
   };
 
   return (
@@ -162,21 +165,20 @@ export default function SearchScreen() {
                     onPress={() => handlePress(result)}
                     className="bg-zinc-900 rounded-3xl overflow-hidden mb-4 active:opacity-90"
                   >
-                    <Image
-                      source={{ uri: result.restaurant.image }}
-                      className="w-full h-48"
-                      resizeMode="cover"
-                    />
                     <View className="p-4">
                       <View className="flex-row justify-between items-start">
                         <Text className="text-white text-lg font-semibold flex-1">
                           {result.restaurant.name}
                         </Text>
-                        <View className="bg-green-600 px-2 py-0.5 rounded flex-row items-center">
-                          <Text className="text-white text-xs font-bold">⭐ {result.restaurant.rating}</Text>
-                        </View>
                       </View>
-                      <Text className="text-zinc-400 mt-1">{result.restaurant.cuisine}</Text>
+                      <Text 
+                        className="text-zinc-400 mt-1"
+                        numberOfLines={2}>
+                          {result.restaurant.description}
+                      </Text>
+                      <Text className="text-zinc-500 mt-2">
+                        {result.restaurant.address}
+                      </Text>
 
                         {/* Show matched dish if any */}
                     {result.dish && (
@@ -186,11 +188,6 @@ export default function SearchScreen() {
                         <Text className="text-emerald-400">₹{result.dish.price}</Text>
                       </View>
                     )}
-                      <View className="flex-row items-center mt-3">
-                        <Text className="text-emerald-400 text-sm">{result.restaurant.time}</Text>
-                        <Text className="text-zinc-500 mx-2">•</Text>
-                        <Text className="text-emerald-400 text-sm">{result.restaurant.deliveryFee}</Text>
-                      </View>
                     </View>
                   </TouchableOpacity>
                 ))}

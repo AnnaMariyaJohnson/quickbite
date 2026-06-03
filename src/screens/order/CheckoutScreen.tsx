@@ -1,26 +1,37 @@
-import React from 'react';
-import {View,Text,TouchableOpacity,ScrollView,Alert} from 'react-native';
+import React, { useState } from 'react';
+import {View,Text,TouchableOpacity,ScrollView,Alert, ActivityIndicator} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCartStore } from '../../store/cartStore';
-import { useOrderStore } from '../../store/orderStore';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/types';
+import {orderApi} from '../../api/orderApi';
+import { useOrderStore } from '../../store/orderStore';
 
 export default function CheckoutSCreen(){
     const {items,totalPrice,clearCart}=useCartStore();
-    const addOrder=useOrderStore(state=>state.addOrder);
+    const addOrder = useOrderStore(state => state.addOrder);
     const navigation=useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    const[loading,setLoading]=useState(false);
 
-    const handlePlaceOrder=()=>{
-        addOrder({
-            id:'QB-' + Date.now(),
-            total:totalPrice,
-            date:new Date().toLocaleDateString(),
-            status:'Delivered',
-            items,
-        });
+    const handlePlaceOrder=async()=>{
+         if (items.length === 0) {
+            Alert.alert(
+                'Cart Empty',
+                'Please add items before placing an order.'
+            );
+            return;
+            }
+
+        try{
+            setLoading(true);
+            const order= await orderApi.createOrder({
+                totalAmount:totalPrice,
+            });
+        addOrder(order);
+
         clearCart();
+        
         Alert.alert(
             'Success',
             'Order placed successfully',
@@ -34,6 +45,15 @@ export default function CheckoutSCreen(){
                 },
             ]
         );
+    }catch(error){
+        console.error(error);
+        Alert.alert(
+            'Error',
+            'Failed to place order. Please try again.'
+        );
+    }finally{
+        setLoading(false);
+    }
     };
 
     return(
@@ -53,6 +73,9 @@ export default function CheckoutSCreen(){
                                 <Text className='text-zinc-400'>
                                     Qty:{item.quantity}
                                 </Text>
+                                <Text className='text-orange-500 font-bold'>
+                                    ₹{item.price}
+                                </Text>
                         </View>
                     ))}
                 </View>
@@ -65,11 +88,16 @@ export default function CheckoutSCreen(){
             </ScrollView>
             <View className='p-4'>
                 <TouchableOpacity
+                    disabled={loading}
                     onPress={handlePlaceOrder}
                     className='bg-orange-600 p-4 rounded-2xl'>
-                        <Text className='text-white text-center'>
-                            Place Order
-                        </Text>
+                        {loading ?(
+                            <ActivityIndicator color="#fff"/>
+                        ):(
+                            <Text className='text-white text-center'>
+                                Place Order
+                            </Text>
+                        )}
                     </TouchableOpacity>
             </View>
         </SafeAreaView>

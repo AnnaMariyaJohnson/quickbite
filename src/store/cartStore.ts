@@ -1,112 +1,185 @@
-import {create} from 'zustand';
-import {persist, createJSONStorage} from 'zustand/middleware';
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export type CartItem={
-    id:string;
-    name:string;
-    price:number;
-    quantity:number;
-    restaurantId:string;
-    image?:string;
-}
-
-type CartStore={
-    items:CartItem[];
-    restaurantId:string | null;
-    addToCart:(item:Omit<CartItem,'quantity'>,restaurantId:string)=>void;
-    removeFromCart:(id:string)=>void;
-    increaseQuantity:(id:string)=>void;
-    decreaseQuantity:(id:string)=>void;
-    clearCart:()=>void;
-    totalItems:number;
-    totalPrice:number;
+export type CartItem = {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  restaurantId: string;
+  image?: string;
 };
 
-export const useCartStore=create<CartStore>()(
-    persist((set,get)=>({
-    items:[],
-    restaurantId:null,
-    totalItems:0,
-    totalPrice:0,
+type CartStore = {
+  items: CartItem[];
+  restaurantId: string | null;
+  totalItems: number;
+  totalPrice: number;
 
-    addToCart:(item,restaurantId)=>{
-        const {items,restaurantId:currentRestId}=get();
+  addToCart: (
+    item: Omit<CartItem, 'quantity'>,
+    restaurantId: string
+  ) => void;
 
-        //clear cart if switching restaurant
-        if(currentRestId && currentRestId !== restaurantId){
-            set({items:[],restaurantId});
+  removeFromCart: (id: string) => void;
+  increaseQuantity: (id: string) => void;
+  decreaseQuantity: (id: string) => void;
+  clearCart: () => void;
+};
+
+export const useCartStore = create<CartStore>()(
+  persist(
+    (set, get) => ({
+      items: [],
+      restaurantId: null,
+      totalItems: 0,
+      totalPrice: 0,
+
+      addToCart: (item, restaurantId) => {
+        let currentItems = get().items;
+        const currentRestaurantId = get().restaurantId;
+
+        // Clear cart when switching restaurants
+        if (
+          currentRestaurantId &&
+          currentRestaurantId !== restaurantId
+        ) {
+          currentItems = [];
         }
 
-        const existingItem=items.findIndex(i=>i.id===item.id);
-
-        let newItems:CartItem[];
-        if(existingItem !== -1){
-          newItems=[...items];
-            newItems[existingItem].quantity +=1;
-        }else{
-            newItems=[...items,{...item,quantity:1}];
-        }  
-        const newTotalItems=newItems.reduce((sum,i)=>sum+i.quantity,0);
-        const newTotalPrice=newItems.reduce((sum,i)=>sum+i.price*i.quantity,0);
-
-        set({
-            items:newItems,
-            restaurantId,
-            totalItems:newTotalItems,
-            totalPrice:newTotalPrice,
-        });
-    },
-    removeFromCart:(id)=>{
-        const newItems=get().items.filter(i=>i.id!==id);
-        const newTotalItems=newItems.reduce((sum,i)=>sum+i.quantity,0);
-        const newTotalPrice=newItems.reduce((sum,i)=>sum+i.price*i.quantity,0);
-
-        set({
-            items:newItems,
-            totalItems:newTotalItems,
-            totalPrice:newTotalPrice,
-        });
-    },
-    decreaseQuantity:(id)=>{
-        const newItems=get().items.map(item=>
-            item.id === id ? {...item,quantity:item.quantity-1} : item
-        ).filter(i=>i.quantity>0);
-
-        const newTotalItems=newItems.reduce((sum,i)=>sum+i.quantity,0);
-        const newTotalPrice=newItems.reduce((sum,i)=>sum+i.price*i.quantity,0);
-
-        set({
-            items:newItems,
-            totalItems:newTotalItems,
-            totalPrice:newTotalPrice,
-        });
-    },
-    increaseQuantity:(id)=>{
-        const newItems=get().items.map(item=>
-            item.id === id ? {...item,quantity:item.quantity+1} : item
+        const existingItemIndex = currentItems.findIndex(
+          i => i.id === item.id
         );
 
-        const newTotalItems=newItems.reduce((sum,i)=>sum+i.quantity,0);
-        const newTotalPrice=newItems.reduce((sum,i)=>sum+i.price*i.quantity,0);
+        let newItems: CartItem[];
+
+        if (existingItemIndex >= 0) {
+          newItems = [...currentItems];
+
+          newItems[existingItemIndex] = {
+            ...newItems[existingItemIndex],
+            quantity: newItems[existingItemIndex].quantity + 1,
+          };
+        } else {
+          newItems = [
+            ...currentItems,
+            {
+              ...item,
+              quantity: 1,
+            },
+          ];
+        }
+
+        const totalItems = newItems.reduce(
+          (sum, item) => sum + item.quantity,
+          0
+        );
+
+        const totalPrice = newItems.reduce(
+          (sum, item) => sum + item.price * item.quantity,
+          0
+        );
 
         set({
-            items:newItems,
-            totalItems:newTotalItems,
-            totalPrice:newTotalPrice,
+          items: newItems,
+          restaurantId,
+          totalItems,
+          totalPrice,
         });
-    },
-    clearCart:()=>{
+      },
+
+      removeFromCart: id => {
+        const newItems = get().items.filter(
+          item => item.id !== id
+        );
+
+        const totalItems = newItems.reduce(
+          (sum, item) => sum + item.quantity,
+          0
+        );
+
+        const totalPrice = newItems.reduce(
+          (sum, item) => sum + item.price * item.quantity,
+          0
+        );
+
         set({
-            items:[],
-            restaurantId:null,
-            totalItems:0,
-            totalPrice:0,
+          items: newItems,
+          totalItems,
+          totalPrice,
         });
-    },
-        }),{
-            name:'cart-storage',
-            storage:createJSONStorage(()=>AsyncStorage),
-        }
-    )
+      },
+
+      increaseQuantity: id => {
+        const newItems = get().items.map(item =>
+          item.id === id
+            ? {
+                ...item,
+                quantity: item.quantity + 1,
+              }
+            : item
+        );
+
+        const totalItems = newItems.reduce(
+          (sum, item) => sum + item.quantity,
+          0
+        );
+
+        const totalPrice = newItems.reduce(
+          (sum, item) => sum + item.price * item.quantity,
+          0
+        );
+
+        set({
+          items: newItems,
+          totalItems,
+          totalPrice,
+        });
+      },
+
+      decreaseQuantity: id => {
+        const newItems = get()
+          .items
+          .map(item =>
+            item.id === id
+              ? {
+                  ...item,
+                  quantity: item.quantity - 1,
+                }
+              : item
+          )
+          .filter(item => item.quantity > 0);
+
+        const totalItems = newItems.reduce(
+          (sum, item) => sum + item.quantity,
+          0
+        );
+
+        const totalPrice = newItems.reduce(
+          (sum, item) => sum + item.price * item.quantity,
+          0
+        );
+
+        set({
+          items: newItems,
+          totalItems,
+          totalPrice,
+        });
+      },
+
+      clearCart: () => {
+        set({
+          items: [],
+          restaurantId: null,
+          totalItems: 0,
+          totalPrice: 0,
+        });
+      },
+    }),
+    {
+      name: 'cart-storage',
+      storage: createJSONStorage(() => AsyncStorage),
+    }
+  )
 );

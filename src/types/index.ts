@@ -2,11 +2,8 @@
  export interface Restaurant{
     id:string;
     name:string;
-    image:string;
-    cuisine:string;
-    rating:number;
-    time:string;
-    deliveryFee: string | number;
+    address:string;
+    description:string;
  }
 
  export interface MenuItem{
@@ -15,9 +12,6 @@
     name:string;
     description?:string;
     price:number;
-    image?:string;
-    isVeg?:boolean;
-    category?:string;
  }
 
  export interface CartItem extends MenuItem{

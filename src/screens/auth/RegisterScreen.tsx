@@ -4,110 +4,76 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import {useNavigation, NavigationProp } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { RootStackParamList } from '../../navigation/types';
-import  api from '../../api/axios';
+import { authApi } from "../../api/authApi";
+import axios from "axios";
 
 type RegisterScreenNavigationProp = NavigationProp<RootStackParamList,'Register'>;
+type ApiErrorResponse = {
+  message?: string;
+};
 
 export default function RegisterScreen(){
     const [name,setName] = useState('');
     const [email,setEmail] = useState('');
+    // Backend currently doesn't support phone number
     const [phone,setPhone] = useState('');
     const [password,setPassword] = useState('');
     const [loading,setLoading] = useState(false);
     const navigation = useNavigation<RegisterScreenNavigationProp>();
 
-    // const handleRegister=async()=>{
-    //     if(!name.trim() || !email.trim() || !phone.trim() || !password.trim()){
-    //         Alert.alert('Error','Please fill in all fields');
-    //         return;
-    //     }
-    //     if(password.length<6){
-    //         Alert.alert('Error','Password must be at least 6 characters');
-    //         return;
-    //     }
-    //     setLoading(true);
-    //     try{
-    //         const response = await api.post('/auth/register',{
-    //             name:name.trim(),
-    //             email:email.trim(),
-    //             phone:phone.trim(),
-    //             password,
-    //         });
-    //         Alert.alert(
-    //             'Account Created',
-    //             'Your account has been created successfully. Please log in.',
-    //             [
-    //                 {
-    //                     text:'Go to Login',
-    //                     onPress:()=>{
-    //                         navigation.navigate('Login');
-    //                     },
-    //                 }
-    //             ]
-    //         );
-    //         setName('');
-    //         setEmail('');
-    //         setPhone('');
-    //         setPassword('');
-    //     }catch(error:unknown){
-    //         let message='Something went wrong. Please try again.';
-    //         if(error && typeof error === 'object' && 'response' in error){
-    //             const err=error as {response?:{data?:{message?:string}}};
-    //             message=err.response?.data?.message || message;
-    //         }else if(error instanceof Error){
-    //             message=error.message;
-    //         }
-    //         Alert.alert('Registration Error',message);
-    //     }finally{
-    //         setLoading(false);
-    //     }
-    // };
-
-// === MOCK REGISTRATION HANDLER (Temporary) ===
-    const handleRegister = async () => {
-    if (!name.trim() || !email.trim() || !phone.trim() || !password.trim()) {
-        Alert.alert('Error', 'Please fill all fields');
-        return;
-    }
-
-    if (password.length < 6) {
-        Alert.alert('Error', 'Password must be at least 6 characters long');
-        return;
-    }
-
-    setLoading(true);
-
-    try {
-        // === MOCK REGISTRATION (Temporary) ===
-        await new Promise(resolve => setTimeout(resolve, 1200)); // Simulate network delay
-
-        // Simulate successful registration
-        Alert.alert(
-        'Account Created Successfully!',
-        `Welcome ${name}! You can now login.`,
-        [
-            {
-            text: 'Go to Login',
-            onPress: () => navigation.navigate('Login'),
-            },
-        ]
-        );
-
-        // Optional: Auto-fill login email
-        // navigation.navigate('Login', { email }); // You can enhance later
-
-    } catch (error: unknown) {
-        let message = 'Something went wrong. Please try again.';
-
-        if (error && typeof error === 'object' && 'message' in error) {
-        message = (error as { message?: string }).message || message;
+    const handleRegister=async()=>{
+        if(
+            !name.trim() ||
+            !email.trim() ||
+            !password.trim()
+        ){
+            Alert.alert('Error','Please fill all the fields');
+            return;
         }
-
-        Alert.alert('Registration Failed', message);
-    } finally {
-        setLoading(false);
+        setLoading(true);
+        try{
+            await authApi.register(
+                name.trim(),
+                email.trim(),
+                password,
+            );
+            setName('');
+            setEmail('');
+            setPhone('');
+            setPassword('');
+            Alert.alert(
+                'Success',
+                'Account created successfully',
+                [
+                    {
+                        text:'Login',
+                        onPress:()=>
+                            navigation.navigate('Login'),
+                    },
+                ], 
+            );
+        }catch(error:unknown){
+            let message='Registration failed. Please try again.';
+            if (axios.isAxiosError<ApiErrorResponse>(error)) {
+                message =
+                    error.response?.data?.message ??
+                    error.message ??
+                    message;
+                } else if(error instanceof Error){
+                message=error.message;
+            }
+            Alert.alert('Registration Error',message);
+        } finally{
+            if(password.length < 6){
+                Alert.alert(
+                    'Error',
+                    'Password must be at least 6 characters long'
+                );
+                return;
+            }
+            setLoading(false);
+        }
     }
-    };
 
     return(
         <SafeAreaView className="flex-1 bg-zinc-950">

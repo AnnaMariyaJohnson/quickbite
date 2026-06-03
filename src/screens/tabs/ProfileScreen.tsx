@@ -36,7 +36,7 @@ export default function ProfileScreen() {
           Login to view your profile and orders
         </Text>
         <TouchableOpacity
-          onPress={() => navigation.navigate('Login' as never)}
+          onPress={() => navigation.navigate('Login')}
           className="bg-orange-600 px-12 py-4 rounded-2xl"
         >
           <Text className="text-white text-lg font-semibold">Login / Sign Up</Text>
@@ -56,6 +56,9 @@ export default function ProfileScreen() {
           </View>
           <Text className="text-white text-2xl font-bold">{user.name}</Text>
           <Text className="text-zinc-400">{user.email}</Text>
+          <Text className='text-zinc-500 text-xs mt-2'>
+            ID:{user.id}
+          </Text>
         </View>
 
         <View className="px-4 mt-6">

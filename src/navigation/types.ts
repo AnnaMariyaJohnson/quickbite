@@ -10,11 +10,8 @@ export type RootStackParamList={
         restaurant:{
             id:string;
             name:string;
-            image:string;
-            cuisine:string;
-            rating:number;
-            time:string;
-            deliveryFee:string | number;
+            address:string;
+            description:string;
         };
     };
     Login:undefined;

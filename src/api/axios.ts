@@ -1,6 +1,7 @@
 // src/api/axios.ts
 import axios, { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
 import { API_BASE_URL } from '@env';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const api: AxiosInstance = axios.create({
   baseURL: API_BASE_URL || 'http://10.0.2.2:5000/api',
@@ -11,7 +12,11 @@ const api: AxiosInstance = axios.create({
 });
 
 api.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
+  async(config:InternalAxiosRequestConfig)=>{
+    const token=await AsyncStorage.getItem('token');
+    if(token){
+      config.headers.Authorization=`Bearer ${token}`;
+    }
     console.log(`🚀 ${config.method?.toUpperCase()} ${config.url}`);
     return config;
   },

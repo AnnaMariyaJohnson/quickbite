@@ -16,7 +16,7 @@ import OrderDetailsScreen from '../screens/order/OrderDetailsScreen';
 import LoginScreen  from '../screens/auth/LoginScreen';
 import RegisterScreen from '../screens/auth/RegisterScreen';
 import { useAuthStore } from '../store/authStore';
-import { Activity, use, useEffect } from 'react';
+import {  useEffect } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 
 const Tab = createBottomTabNavigator<TabParamList>();

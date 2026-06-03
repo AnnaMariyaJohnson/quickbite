@@ -6,11 +6,8 @@ import { RootStackParamList } from '../../navigation/types';
 type RestaurantCardProps={
     id:string;
     name:string;
-    image:string;
-    cuisine:string;
-    rating:number;
-    time:string;
-    deliveryFee:string | number;
+    address:string;
+    description:string;
 };
 
 type RestaurantNavigationProp=NativeStackNavigationProp<RootStackParamList, 'Restaurant'>
@@ -18,11 +15,8 @@ type RestaurantNavigationProp=NativeStackNavigationProp<RootStackParamList, 'Res
 export default function RestaurantCard({
     id,
     name,
-    image,
-    cuisine,
-    rating, 
-    time,
-    deliveryFee,
+    address,
+    description,
 }:RestaurantCardProps){
     const navigation=useNavigation<RestaurantNavigationProp>();
 
@@ -31,38 +25,32 @@ export default function RestaurantCard({
             restaurant:{
                 id,
                 name,
-                image,
-                cuisine,
-                rating,
-                time,
-                deliveryFee
+                address,
+                description,
             },
         });
     };
 
-    return(
-        <TouchableOpacity
-            onPress={handlePress}
-            className='mb-5 rounded-3xl overflow-hidden bg-zinc-900'
-            activeOpacity={0.9}>
-                <Image source={{uri:image}} className='"w-full h-48' resizeMode='cover'/>
-                <View className='p-4'>
-                    <View className='flex-row justify-between items-start'>
-                        <Text className='text-white text-lg font-semibold flex-1' numberOfLines={1}>
-                            {name}
-                        </Text>
-                        <View className='bg-green-600 px-2 py-0.5 rounded flex-row items-center'>
-                            <Text className='text-white text-xs font-bold'>*{rating}</Text>
-                        </View>
-                    </View>
-                    <Text className='text-zinc-400 mt-1'>{cuisine}</Text>
-                </View>
+    return (
+    <TouchableOpacity
+      onPress={handlePress}
+      className="mb-4 rounded-2xl bg-zinc-900 p-4"
+      activeOpacity={0.8}
+    >
+      <Text className="text-white text-xl font-bold">
+        {name}
+      </Text>
 
-                <View className='flex-row items-center mt-2'>
-                    <Text className='text-emerald-400 text-sm'>{time}</Text>
-                    <Text className='text-zinc-500 mx-2'>*</Text>
-                    <Text className='text-emerald-400 text-sm'>{deliveryFee}</Text>
-                </View>
-            </TouchableOpacity>
-    )
+      <Text className="text-orange-500 mt-2">
+        📍 {address}
+      </Text>
+
+      <Text
+        className="text-zinc-400 mt-2"
+        numberOfLines={2}
+      >
+        {description}
+      </Text>
+    </TouchableOpacity>
+  );
 }

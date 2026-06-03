@@ -48,44 +48,21 @@ export default function OrderDetailsScreen(){
           </Text>
 
           <Text className="text-white">
-            {order.date}
+            {new Date(order.createdAt).toLocaleString()}
           </Text>
 
           <Text className="text-zinc-400 mt-4">
-            Status
+            User ID
           </Text>
 
-          <Text className="text-emerald-400">
-            {order.status || 'Delivered'}
+          <Text className="text-white">
+            {order.userId}
           </Text>
         </View>
 
-        <Text className="text-white text-xl font-semibold mt-6 mb-3">
-          Items
-        </Text>
-
-        {order.items.map(item => (
-          <View
-            key={item.id}
-            className="bg-zinc-900 rounded-2xl p-4 mb-3"
-          >
-            <Text className="text-white font-semibold">
-              {item.name}
-            </Text>
-
-            <Text className="text-zinc-400">
-              Qty: {item.quantity}
-            </Text>
-
-            <Text className="text-orange-500">
-              ₹{item.price}
-            </Text>
-          </View>
-        ))}
-
         <View className="bg-zinc-900 rounded-2xl p-4 mt-4">
           <Text className="text-white text-xl font-bold">
-            Total: ₹{order.total}
+            Total: ₹{order.totalAmount}
           </Text>
         </View>
 

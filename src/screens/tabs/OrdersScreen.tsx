@@ -1,13 +1,43 @@
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useOrderStore } from '../../store/orderStore';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/types';
+import {orderApi} from '../../api/orderApi';
+import React,{ useEffect, useState } from 'react';
+import { useOrderStore } from '../../store/orderStore';
 
 export default function OrdersScreen() {
   const orders = useOrderStore(state => state.orders);
+  const setOrders = useOrderStore(state => state.setOrders);
+  const [loading,setLoading]=useState(true);
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  useEffect(()=>{
+    loadOrders();
+  },[]);
+
+  const loadOrders=async()=>{
+    try{
+      const data=await orderApi.getOrders();
+      setOrders(data);
+    } catch(error){
+      console.error('Failed to load orders:',error);
+    }finally{
+      setLoading(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <SafeAreaView className="flex-1 bg-zinc-950 justify-center items-center">
+        <ActivityIndicator size="large" color="#f97316" />
+        <Text className="text-white mt-4">
+          Loading orders...
+        </Text>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-zinc-950">
@@ -43,15 +73,15 @@ export default function OrdersScreen() {
                   {order.id}
                 </Text>
                 <Text className='text-orange-500 font-bold text-lg'>
-                  ₹{order.total}
+                  ₹{order.totalAmount}
                 </Text>
               </View>
               <Text className='text-zinc-400 mt-2'>
-                Ordered on {order.date}
+                Ordered on {new Date(order.createdAt).toLocaleDateString()}
               </Text>
               <View className='mt-3'>
-                <Text className='text-emerald-400'>
-                  Delivered
+                <Text className='text-orange-400'>
+                  Order Placed
                 </Text>
               </View>
             </TouchableOpacity>

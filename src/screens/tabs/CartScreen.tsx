@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, Image, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, ScrollView,  TouchableOpacity,  } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCartStore } from '../../store/cartStore';
 import { useNavigation } from '@react-navigation/native';
@@ -54,14 +54,6 @@ export default function CartScreen() {
               key={item.id}
               className="bg-zinc-900 rounded-3xl p-4 flex-row"
             >
-              {/* Image */}
-              {item.image && (
-                <Image
-                  source={{ uri: item.image }}
-                  className="w-24 h-24 rounded-2xl mr-4"
-                  resizeMode="cover"
-                />
-              )}
 
               {/* Details */}
               <View className="flex-1">

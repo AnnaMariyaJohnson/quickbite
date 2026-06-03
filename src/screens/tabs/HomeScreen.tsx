@@ -1,6 +1,6 @@
 // src/screens/tabs/HomeScreen.tsx
-import React, { use, useEffect, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, RefreshControl, Image } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, RefreshControl} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -36,10 +36,12 @@ export default function HomeScreen() {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await fetchRestaurants();
+    try{
+        await fetchRestaurants();
+    }finally{
     setRefreshing(false);
   };
-
+  }
   const goToSearch = () => {
     navigation.navigate('Tabs', { screen: 'Search' });
   };
@@ -87,11 +89,8 @@ export default function HomeScreen() {
                 key={restaurant.id}
                 id={restaurant.id}
                 name={restaurant.name}
-                image={restaurant.image}
-                cuisine={restaurant.cuisine}
-                rating={restaurant.rating}
-                time={restaurant.time}
-                deliveryFee={restaurant.deliveryFee}
+                address={restaurant.address}
+                description={restaurant.description}
               />
             ))
           )}
