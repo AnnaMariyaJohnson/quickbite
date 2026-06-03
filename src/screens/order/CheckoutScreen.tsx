@@ -1,4 +1,4 @@
-import React, { use } from 'react';
+import React from 'react';
 import {View,Text,TouchableOpacity,ScrollView,Alert} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCartStore } from '../../store/cartStore';
@@ -17,6 +17,7 @@ export default function CheckoutSCreen(){
             id:'QB-' + Date.now(),
             total:totalPrice,
             date:new Date().toLocaleDateString(),
+            status:'Delivered',
             items,
         });
         clearCart();

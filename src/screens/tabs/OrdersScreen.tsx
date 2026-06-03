@@ -1,9 +1,13 @@
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useOrderStore } from '../../store/orderStore';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../navigation/types';
 
 export default function OrdersScreen() {
   const orders = useOrderStore(state => state.orders);
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   return (
     <SafeAreaView className="flex-1 bg-zinc-950">
@@ -27,8 +31,12 @@ export default function OrdersScreen() {
           Order History
         </Text>
         {orders.map(order=>(
-          <View
+          <TouchableOpacity
             key={order.id}
+            onPress={() => navigation.navigate('OrderDetails', 
+              { orderId: order.id ,
+              })
+            }
             className='bg-zinc-900 rounded-2xl p-4 mb-4'>
               <View className='flex-row justify-between items-center'>
                 <Text className='text-white font-semibold text-lg'>
@@ -46,7 +54,7 @@ export default function OrdersScreen() {
                   Delivered
                 </Text>
               </View>
-            </View>
+            </TouchableOpacity>
         ))}
         </>
        )}

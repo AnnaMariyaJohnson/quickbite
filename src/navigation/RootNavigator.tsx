@@ -11,6 +11,7 @@ import ProfileScreen from '../screens/tabs/ProfileScreen';
 import CartScreen from '../screens/tabs/CartScreen';
 import { useCartStore } from '../store/cartStore';
 import CheckoutSCreen from '../screens/order/CheckoutScreen';
+import OrderDetailsScreen from '../screens/order/OrderDetailsScreen';
 
 import LoginScreen  from '../screens/auth/LoginScreen';
 import RegisterScreen from '../screens/auth/RegisterScreen';
@@ -119,6 +120,11 @@ export default function RootNavigator() {
         name="Checkout"
         component={CheckoutSCreen}
         />
+        <Stack.Screen
+          name="OrderDetails"
+          component={OrderDetailsScreen}
+      />
     </Stack.Navigator>
+    
   );
 }
