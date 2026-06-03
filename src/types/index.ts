@@ -4,6 +4,8 @@
     name:string;
     address:string;
     description:string;
+    imageUrl:string;
+    rating:number;
  }
 
  export interface MenuItem{
@@ -12,6 +14,9 @@
     name:string;
     description?:string;
     price:number;
+    imageUrl:string;
+    isVeg:boolean;
+    category:string;
  }
 
  export interface CartItem extends MenuItem{

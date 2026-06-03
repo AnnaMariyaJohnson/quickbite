@@ -1,22 +1,23 @@
-import React, { useEffect, useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
+  Image,
   RefreshControl,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useCartStore } from '../../store/cartStore';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { menuApi } from '../../api/menuApi';
 import {
   RestaurantScreenProps,
   RootStackParamList,
 } from '../../navigation/types';
-import { menuApi } from '../../api/menuApi';
+import { useCartStore } from '../../store/cartStore';
 import { MenuItem } from '../../types';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 export default function RestaurantScreen({
   route,
@@ -32,11 +33,8 @@ export default function RestaurantScreen({
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    fetchMenu();
-  }, [restaurant.id]);
 
-  const fetchMenu = async () => {
+  const fetchMenu = useCallback(async () => {
     try {
       const data = await menuApi.getByRestaurantId(
         restaurant.id,
@@ -48,7 +46,11 @@ export default function RestaurantScreen({
     } finally {
       setLoading(false);
     }
-  };
+  }, [restaurant.id]);
+
+useEffect(() => {
+  fetchMenu();
+}, [fetchMenu]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -71,6 +73,11 @@ export default function RestaurantScreen({
   return (
     <SafeAreaView className="flex-1 bg-zinc-950">
       {/* Header */}
+      <Image
+      source={{ uri: restaurant.imageUrl }}
+      className="w-full h-60"
+      resizeMode="cover"
+    />
       <View className="flex-row items-center px-4 py-4 border-b border-zinc-800">
         <TouchableOpacity
           onPress={() => navigation.goBack()}
@@ -103,6 +110,12 @@ export default function RestaurantScreen({
           <Text className="text-white text-3xl font-bold">
             {restaurant.name}
           </Text>
+
+          <View className="flex-row items-center mt-2">
+            <Text className="text-yellow-400">
+              ⭐ {restaurant.rating}
+            </Text>
+          </View>
 
           <Text className="text-zinc-400 mt-2">
             {restaurant.address}

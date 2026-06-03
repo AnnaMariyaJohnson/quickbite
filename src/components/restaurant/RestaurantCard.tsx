@@ -1,6 +1,6 @@
-import {View, Text,Image,TouchableOpacity} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { RootStackParamList } from '../../navigation/types';
 
 type RestaurantCardProps={
@@ -8,6 +8,8 @@ type RestaurantCardProps={
     name:string;
     address:string;
     description:string;
+    imageUrl:string;
+    rating:number;
 };
 
 type RestaurantNavigationProp=NativeStackNavigationProp<RootStackParamList, 'Restaurant'>
@@ -17,6 +19,8 @@ export default function RestaurantCard({
     name,
     address,
     description,
+    imageUrl,
+    rating
 }:RestaurantCardProps){
     const navigation=useNavigation<RestaurantNavigationProp>();
 
@@ -27,6 +31,8 @@ export default function RestaurantCard({
                 name,
                 address,
                 description,
+                imageUrl,
+                rating,
             },
         });
     };
@@ -37,9 +43,23 @@ export default function RestaurantCard({
       className="mb-4 rounded-2xl bg-zinc-900 p-4"
       activeOpacity={0.8}
     >
+       <Image
+        source={{ uri: imageUrl }}
+        className="w-full h-48"
+        resizeMode="cover"
+      />
+       <View className="p-4">
+        <View className="flex-row justify-between">
       <Text className="text-white text-xl font-bold">
         {name}
       </Text>
+
+        <View className="bg-green-600 px-2 py-1 rounded">
+            <Text className="text-white">
+              ⭐ {rating}
+            </Text>
+          </View>
+        </View>
 
       <Text className="text-orange-500 mt-2">
         📍 {address}
@@ -51,6 +71,7 @@ export default function RestaurantCard({
       >
         {description}
       </Text>
+      </View>
     </TouchableOpacity>
   );
 }

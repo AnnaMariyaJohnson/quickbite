@@ -1,15 +1,15 @@
 // src/screens/tabs/HomeScreen.tsx
-import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, RefreshControl} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../../navigation/types';
-import RestaurantCard from '../../components/restaurant/RestaurantCard';
-import { restaurantApi } from '../../api/restaurantApi';
-import { Restaurant } from '../../types/index';
+import React, { useEffect, useState } from 'react';
+import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { restaurantApi } from '../../api/restaurantApi';
+import RestaurantCard from '../../components/restaurant/RestaurantCard';
+import { RootStackParamList } from '../../navigation/types';
 import { useAuthStore } from '../../store/authStore';
+import { Restaurant } from '../../types/index';
 
 export default function HomeScreen() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
@@ -91,6 +91,8 @@ export default function HomeScreen() {
                 name={restaurant.name}
                 address={restaurant.address}
                 description={restaurant.description}
+                imageUrl={restaurant.imageUrl}
+                rating={restaurant.rating}
               />
             ))
           )}

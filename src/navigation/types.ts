@@ -1,7 +1,5 @@
 import { NavigatorScreenParams } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 
 // Define all your screens and  their params here
 export type RootStackParamList={
@@ -12,6 +10,8 @@ export type RootStackParamList={
             name:string;
             address:string;
             description:string;
+            imageUrl:string;
+            rating:number;
         };
     };
     Login:undefined;

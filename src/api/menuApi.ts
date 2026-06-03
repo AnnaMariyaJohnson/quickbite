@@ -11,9 +11,9 @@ export const menuApi={
         return response.data;
     },
 
-    getByRestaurantId:async(restaurnatId:string)=>{
+    getByRestaurantId:async(restaurantId:string)=>{
         const response= await api.get(
-            `/Menu/restaurant/${restaurnatId}`
+            `/Menu/restaurant/${restaurantId}`
         );
         return response.data;
     }
