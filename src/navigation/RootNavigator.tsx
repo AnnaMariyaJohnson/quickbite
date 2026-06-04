@@ -12,7 +12,7 @@ import CartScreen from '../screens/tabs/CartScreen';
 import { useCartStore } from '../store/cartStore';
 import CheckoutSCreen from '../screens/order/CheckoutScreen';
 import OrderDetailsScreen from '../screens/order/OrderDetailsScreen';
-
+import EditProfileScreen from '../screens/profile/EditProfileScreen';
 import LoginScreen  from '../screens/auth/LoginScreen';
 import RegisterScreen from '../screens/auth/RegisterScreen';
 import { useAuthStore } from '../store/authStore';
@@ -123,6 +123,10 @@ export default function RootNavigator() {
         <Stack.Screen
           name="OrderDetails"
           component={OrderDetailsScreen}
+      />
+      <Stack.Screen
+        name="EditProfile"
+        component={EditProfileScreen}
       />
     </Stack.Navigator>
     

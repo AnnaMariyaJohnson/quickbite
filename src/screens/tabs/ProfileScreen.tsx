@@ -59,6 +59,16 @@ export default function ProfileScreen() {
           <Text className='text-zinc-500 text-xs mt-2'>
             ID:{user.id}
           </Text>
+          <TouchableOpacity
+            className="bg-orange-600 px-6 py-2 rounded-xl mt-4"
+            onPress={() =>
+              navigation.navigate('EditProfile')
+            }
+          >
+            <Text className="text-white font-semibold">
+              Edit Profile
+            </Text>
+          </TouchableOpacity>
         </View>
 
         <View className="px-4 mt-6">

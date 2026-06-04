@@ -17,6 +17,7 @@ export type RootStackParamList={
     Login:undefined;
     Register:undefined;
     Checkout:undefined;
+    EditProfile:undefined;
     OrderDetails:{
         orderId:string;
     };
