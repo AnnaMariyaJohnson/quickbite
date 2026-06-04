@@ -38,33 +38,53 @@ export const useAuthStore=create<AuthState>((set,get)=>({
     isLoading:true,
     isAuthenticated:false,
 
-    login:async(email:string,password:string)=>{
-        try{
-            const loginResponse=await authApi.login(
-                email,
-                password,
-            );
-            const token=loginResponse.token;
-            await AsyncStorage.setItem('authToken',token);
+    // login:async(email:string,password:string)=>{
+    //     try{
+    //         const loginResponse=await authApi.login(
+    //             email,
+    //             password,
+    //         );
+    //         const token=loginResponse.token;
+    //         await AsyncStorage.setItem('authToken',token);
 
-            api.defaults.headers.common['Authorization']=`Bearer ${token}`;
+    //         api.defaults.headers.common['Authorization']=`Bearer ${token}`;
 
-            const meResponse=await api.get('/auth/me');
-            const user:User={
-                id:meResponse.data.userId,
-                name:meResponse.data.fullName,
-                email:meResponse.data.email,
-            };
-            set({
-                user,
-                token,
-                isAuthenticated:true,
-            });
-        }catch(error){
-            console.error('Login failed:',error);
-            throw error;
-        }
-    },
+    //         const meResponse=await api.get('/auth/me');
+    //         const user:User={
+    //             id:meResponse.data.userId,
+    //             name:meResponse.data.fullName,
+    //             email:meResponse.data.email,
+    //         };
+    //         set({
+    //             user,
+    //             token,
+    //             isAuthenticated:true,
+    //         });
+    //     }catch(error){
+    //         console.error('Login failed:',error);
+    //         throw error;
+    //     }
+    // },
+
+    login: async (email: string, password: string) => {
+        const user = {
+            id: "1",
+            name: "Test User",
+            email,
+        };
+
+        const token = "mock_token";
+
+        await AsyncStorage.setItem("authToken", token);
+
+        api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+        set({
+            user,
+            token,
+            isAuthenticated: true,
+        });
+        },
 
     logout:async()=>{
         try{

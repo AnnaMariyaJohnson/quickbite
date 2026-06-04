@@ -16,6 +16,14 @@ export default function OrderDetailsScreen(){
     const order=useOrderStore(state=>
         state.orders.find(o=>o.id===orderId));
     
+    const formatDate=(date?:string)=>{
+      if(!date)return "Unknown date";
+      const parsed =new Date(date);
+      if(isNaN(parsed.getTime()))
+        return "Unknown date";
+      return parsed.toDateString();
+    }
+    
         if(!order){
             return(
                 <SafeAreaView className="flex-1 bg-zinc-950 justify-center items-center">
@@ -48,7 +56,7 @@ export default function OrderDetailsScreen(){
           </Text>
 
           <Text className="text-white">
-            {new Date(order.createdAt).toLocaleString()}
+            {formatDate(order.createdAt)}
           </Text>
 
           <Text className="text-zinc-400 mt-4">

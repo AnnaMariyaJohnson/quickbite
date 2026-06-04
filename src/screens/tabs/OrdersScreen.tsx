@@ -28,6 +28,15 @@ export default function OrdersScreen() {
     }
   }
 
+  const formatDate=(date?:string)=>{
+    if(!date)return "Unknown date";
+    const parsed =new Date(date);
+    if(isNaN(parsed.getTime()))
+      return "Unknown date";
+    return parsed.toDateString();
+  }
+  
+
   if (loading) {
     return (
       <SafeAreaView className="flex-1 bg-zinc-950 justify-center items-center">
@@ -77,7 +86,7 @@ export default function OrdersScreen() {
                 </Text>
               </View>
               <Text className='text-zinc-400 mt-2'>
-                Ordered on {new Date(order.createdAt).toLocaleDateString()}
+                Ordered on {formatDate(order.createdAt)}
               </Text>
               <View className='mt-3'>
                 <Text className='text-orange-400'>

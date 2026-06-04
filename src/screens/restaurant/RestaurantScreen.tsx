@@ -8,6 +8,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -36,21 +37,19 @@ export default function RestaurantScreen({
 
   const fetchMenu = useCallback(async () => {
     try {
-      const data = await menuApi.getByRestaurantId(
-        restaurant.id,
-      );
-
-      setMenu(data);
+      const data = await menuApi.getByRestaurantId(restaurant.id);
+      setMenu(data || []);
     } catch (error) {
       console.error('Failed to load menu:', error);
+      setMenu([]);
     } finally {
       setLoading(false);
     }
   }, [restaurant.id]);
 
-useEffect(() => {
-  fetchMenu();
-}, [fetchMenu]);
+  useEffect(() => {
+    fetchMenu();
+  }, [fetchMenu]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -61,10 +60,10 @@ useEffect(() => {
   const handleAddToCart = (item: MenuItem) => {
     addToCart(
       {
-      id: item.id,
-      name: item.name,
-      price: item.price,
-      restaurantId: restaurant.id,
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        restaurantId: restaurant.id,
       },
       restaurant.id,
     );
@@ -72,27 +71,25 @@ useEffect(() => {
 
   return (
     <SafeAreaView className="flex-1 bg-zinc-950">
-      {/* Header */}
-      <Image
-      source={{ uri: restaurant.imageUrl }}
-      className="w-full h-60"
-      resizeMode="cover"
-    />
-      <View className="flex-row items-center px-4 py-4 border-b border-zinc-800">
+
+      {/* HEADER IMAGE SECTION */}
+      <View className="relative">
+        <Image
+          source={{ uri: restaurant.imageUrl }}
+          className="w-full h-60"
+          resizeMode="cover"
+        />
+
+        {/* Back Button Overlay */}
         <TouchableOpacity
           onPress={() => navigation.goBack()}
-          className="mr-4"
+          className="absolute top-10 left-4 bg-black/60 p-2 rounded-full"
         >
-          <Icon
-            name="arrow-back"
-            size={28}
-            color="#ffffff"
-          />
+          <Icon name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
 
-        <Text className="text-white text-xl font-semibold">
-          Restaurant
-        </Text>
+        {/* Gradient overlay feel (simple dark layer) */}
+        <View className="absolute bottom-0 left-0 right-0 h-20 bg-black/40" />
       </View>
 
       <ScrollView
@@ -105,37 +102,45 @@ useEffect(() => {
           />
         }
       >
-        {/* Restaurant Info */}
-        <View className="p-4">
-          <Text className="text-white text-3xl font-bold">
-            {restaurant.name}
-          </Text>
+        {/* RESTAURANT INFO */}
+        <View className="px-4 pt-4">
 
-          <View className="flex-row items-center mt-2">
-            <Text className="text-yellow-400">
-              ⭐ {restaurant.rating}
+          {/* Name + Rating */}
+          <View className="flex-row justify-between items-start">
+            <Text className="text-white text-3xl font-bold flex-1 pr-2">
+              {restaurant.name}
             </Text>
+
+            <View className="bg-green-600 px-3 py-1 rounded-lg">
+              <Text className="text-white font-semibold">
+                ⭐ {restaurant.rating}
+              </Text>
+            </View>
           </View>
 
-          <Text className="text-zinc-400 mt-2">
-            {restaurant.address}
+          {/* Address */}
+          <Text className="text-orange-400 mt-2">
+            📍 {restaurant.address}
           </Text>
 
-          <Text className="text-zinc-300 mt-4">
+          {/* Description */}
+          <Text className="text-zinc-400 mt-3 leading-5">
             {restaurant.description}
           </Text>
 
-          {/* Menu */}
+          {/* MENU TITLE */}
           <Text className="text-white text-2xl font-semibold mt-8 mb-4">
             Menu
           </Text>
 
+          {/* MENU SECTION */}
           {loading ? (
-            <Text className="text-zinc-400 text-center py-12">
-              Loading menu items...
-            </Text>
+            <View className="py-10 items-center">
+              <ActivityIndicator color="#FF3D00" size="large" />
+              <Text className="text-zinc-400 mt-3">Loading menu...</Text>
+            </View>
           ) : menu.length === 0 ? (
-            <Text className="text-zinc-400 text-center py-12">
+            <Text className="text-zinc-400 text-center py-10">
               No menu items available
             </Text>
           ) : (
@@ -144,25 +149,31 @@ useEffect(() => {
                 key={item.id}
                 className="bg-zinc-900 rounded-2xl p-4 mb-3 flex-row items-center"
               >
-                <View className="flex-1">
+                {/* LEFT SIDE */}
+                <View className="flex-1 pr-3">
+
+                  {/* Name */}
                   <Text className="text-white text-lg font-semibold">
                     {item.name}
                   </Text>
 
-                  {item.description ? (
-                    <Text className="text-zinc-400 mt-1">
+                  {/* Description */}
+                  {!!item.description && (
+                    <Text className="text-zinc-400 mt-1" numberOfLines={2}>
                       {item.description}
                     </Text>
-                  ) : null}
+                  )}
 
+                  {/* Price */}
                   <Text className="text-orange-500 font-bold text-xl mt-2">
                     ₹{item.price}
                   </Text>
                 </View>
 
+                {/* RIGHT BUTTON */}
                 <TouchableOpacity
                   onPress={() => handleAddToCart(item)}
-                  className="bg-orange-600 px-6 py-3 rounded-xl"
+                  className="bg-orange-600 px-5 py-3 rounded-xl"
                 >
                   <Text className="text-white font-semibold">
                     Add
