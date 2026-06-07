@@ -1,10 +1,11 @@
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView ,Alert} from 'react-native';
+import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useAuthStore } from '../../store/authStore';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { useNavigation,NavigationProp } from '@react-navigation/native';
-import { RootStackParamList } from '../../navigation/types';;
+import { RootStackParamList } from '../../navigation/types';
+import { useAuthStore } from '../../store/authStore';
+;
 
 type ProfileScreenNavigationProp = NavigationProp<RootStackParamList>;
 
@@ -74,7 +75,6 @@ export default function ProfileScreen() {
         <View className="px-4 mt-6">
           {/* Menu Items */}
           {[
-            { title: 'My Addresses', icon: 'location-on' },
             { title: 'Payment Methods', icon: 'payment' },
             { title: 'Favorites', icon: 'favorite' },
             { title: 'Order History', icon: 'history' },
@@ -82,9 +82,20 @@ export default function ProfileScreen() {
             { title: 'Help & Support', icon: 'help-outline' },
           ].map((item, i) => (
             <TouchableOpacity key={i} className="flex-row items-center py-5 border-b border-zinc-800"
-            onPress={()=>{
-              if(item.title==='Order History'){
-                navigation.navigate('Tabs',{screen:'Orders'});
+              onPress={() => {
+              switch (item.title) {
+                case 'My Addresses':
+                  navigation.navigate('Addresses');
+                  break;
+
+                case 'Order History':
+                  navigation.navigate('Tabs', {
+                    screen: 'Orders',
+                  });
+                  break;
+
+                default:
+                  break;
               }
             }}>
               <Icon name={item.icon} size={28} color="#71717a" />

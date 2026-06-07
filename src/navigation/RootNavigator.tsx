@@ -1,23 +1,26 @@
 // src/navigation/index.tsx  (or wherever your navigator is)
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { RootStackParamList, TabParamList } from './types';
-import RestaurantScreen from '../screens/restaurant/RestaurantScreen';
+import { useEffect } from 'react';
+import { ActivityIndicator, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import HomeScreen from '../screens/tabs/HomeScreen';
-import SearchScreen from '../screens/tabs/SearchScreen';
-import OrdersScreen from '../screens/tabs/OrdersScreen';
-import ProfileScreen from '../screens/tabs/ProfileScreen';
-import CartScreen from '../screens/tabs/CartScreen';
-import { useCartStore } from '../store/cartStore';
+import LoginScreen from '../screens/auth/LoginScreen';
+import RegisterScreen from '../screens/auth/RegisterScreen';
 import CheckoutSCreen from '../screens/order/CheckoutScreen';
 import OrderDetailsScreen from '../screens/order/OrderDetailsScreen';
+import AddAddressScreen from '../screens/profile/AddAddressScreen';
+import AddressesScreen from '../screens/profile/AddressesScreen';
+import EditAddressScreen from '../screens/profile/EditAddressScreen';
 import EditProfileScreen from '../screens/profile/EditProfileScreen';
-import LoginScreen  from '../screens/auth/LoginScreen';
-import RegisterScreen from '../screens/auth/RegisterScreen';
+import RestaurantScreen from '../screens/restaurant/RestaurantScreen';
+import CartScreen from '../screens/tabs/CartScreen';
+import HomeScreen from '../screens/tabs/HomeScreen';
+import OrdersScreen from '../screens/tabs/OrdersScreen';
+import ProfileScreen from '../screens/tabs/ProfileScreen';
+import SearchScreen from '../screens/tabs/SearchScreen';
 import { useAuthStore } from '../store/authStore';
-import {  useEffect } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { useCartStore } from '../store/cartStore';
+import { RootStackParamList, TabParamList } from './types';
 
 const Tab = createBottomTabNavigator<TabParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -127,6 +130,20 @@ export default function RootNavigator() {
       <Stack.Screen
         name="EditProfile"
         component={EditProfileScreen}
+      />
+      <Stack.Screen
+        name="Addresses"
+        component={AddressesScreen}
+      />
+
+      <Stack.Screen
+        name="AddAddress"
+        component={AddAddressScreen}
+      />
+
+      <Stack.Screen
+        name="EditAddress"
+        component={EditAddressScreen}
       />
     </Stack.Navigator>
     

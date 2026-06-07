@@ -21,6 +21,11 @@ export type RootStackParamList={
     OrderDetails:{
         orderId:string;
     };
+    Addresses: undefined;
+    AddAddress: undefined;
+    EditAddress: {
+    id: string;
+    };
 }
 
 export type TabParamList={
