@@ -1,7 +1,7 @@
-import {create} from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import api from '../api/axios';
+import { create } from 'zustand';
 import { authApi } from '../api/authApi';
+import api from '../api/axios';
 
 type User={
     id:string;
@@ -32,64 +32,64 @@ type AuthState={
     loadStoredUser:()=>Promise<void>;   
 };
 
-export const useAuthStore=create<AuthState>((set,get)=>({
+export const useAuthStore=create<AuthState>((set)=>({
     user:null,
     token:null,
     isLoading:true,
     isAuthenticated:false,
 
-    // login:async(email:string,password:string)=>{
-    //     try{
-    //         const loginResponse=await authApi.login(
-    //             email,
-    //             password,
-    //         );
-    //         const token=loginResponse.token;
-    //         await AsyncStorage.setItem('authToken',token);
+    login:async(email:string,password:string)=>{
+        try{
+            const loginResponse=await authApi.login(
+                email,
+                password,
+            );
+            const token=loginResponse.token;
+            await AsyncStorage.setItem('authToken',token);
 
-    //         api.defaults.headers.common['Authorization']=`Bearer ${token}`;
+            api.defaults.headers.common.Authorization=`Bearer ${token}`;
 
-    //         const meResponse=await api.get('/auth/me');
-    //         const user:User={
-    //             id:meResponse.data.userId,
-    //             name:meResponse.data.fullName,
-    //             email:meResponse.data.email,
-    //         };
-    //         set({
-    //             user,
-    //             token,
-    //             isAuthenticated:true,
-    //         });
-    //     }catch(error){
-    //         console.error('Login failed:',error);
-    //         throw error;
-    //     }
-    // },
+            const meResponse=await api.get('/auth/me');
+            const user:User={
+                id:meResponse.data.userId,
+                name:meResponse.data.fullName,
+                email:meResponse.data.email,
+            };
+            set({
+                user,
+                token,
+                isAuthenticated:true,
+            });
+        }catch(error){
+            console.error('Login failed:',error);
+            throw error;
+        }
+    },
 
-    login: async (email: string, password: string) => {
-        const user = {
-            id: "1",
-            name: "Test User",
-            email,
-        };
+    // login: async (email: string, password: string) => {
+    //     const user = {
+    //         id: "1",
+    //         name: "Test User",
+    //         email,
+    //     };
 
-        const token = "mock_token";
+    //     const token = "mock_token";
 
-        await AsyncStorage.setItem("authToken", token);
+    //     await AsyncStorage.setItem("authToken", token);
 
-        api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    //     api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-        set({
-            user,
-            token,
-            isAuthenticated: true,
-        });
-        },
+    //     set({
+    //         user,
+    //         token,
+    //         isAuthenticated: true,
+    //     });
+    //     },
 
     logout:async()=>{
         try{
             await AsyncStorage.removeItem('authToken');
-            delete api.defaults.headers.common['Authorization'];
+            delete api.defaults.headers.common.Authorization;
         }catch(e){
             console.warn('Error clearing token:',e);
         } finally{
@@ -108,7 +108,7 @@ export const useAuthStore=create<AuthState>((set,get)=>({
                 set({isLoading:false});
                 return;
             }
-            api.defaults.headers.common['Authorization']=`Bearer ${token}`;
+            api.defaults.headers.common.Authorization=`Bearer ${token}`;
             const response=await api.get('/auth/me');
             const  user:User={
                 id:response.data.userId,

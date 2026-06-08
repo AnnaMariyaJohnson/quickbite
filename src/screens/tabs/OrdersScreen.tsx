@@ -1,10 +1,10 @@
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { orderApi } from '../../api/orderApi';
 import { RootStackParamList } from '../../navigation/types';
-import {orderApi} from '../../api/orderApi';
-import React,{ useEffect, useState } from 'react';
 import { useOrderStore } from '../../store/orderStore';
 
 export default function OrdersScreen() {
@@ -13,20 +13,21 @@ export default function OrdersScreen() {
   const [loading,setLoading]=useState(true);
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  useEffect(()=>{
-    loadOrders();
-  },[]);
 
-  const loadOrders=async()=>{
-    try{
-      const data=await orderApi.getOrders();
-      setOrders(data);
-    } catch(error){
-      console.error('Failed to load orders:',error);
-    }finally{
-      setLoading(false);
-    }
+  const loadOrders = useCallback(async () => {
+  try {
+    const data = await orderApi.getOrders();
+    setOrders(data);
+  } catch (error) {
+    console.error('Failed to load orders:', error);
+  } finally {
+    setLoading(false);
   }
+}, [setOrders]);
+
+  useEffect(() => {
+    loadOrders();
+  }, [loadOrders]);
 
   const formatDate=(date?:string)=>{
     if(!date)return "Unknown date";
@@ -77,11 +78,15 @@ export default function OrdersScreen() {
               })
             }
             className='bg-zinc-900 rounded-2xl p-4 mb-4'>
-              <View className='flex-row justify-between items-center'>
-                <Text className='text-white font-semibold text-lg'>
-                  {order.id}
+             <View className="flex-row justify-between items-center">
+                <Text
+                  className="text-white font-semibold flex-1 mr-2"
+                  numberOfLines={1}
+                >
+                  Order #{order.id.slice(0, 8)}
                 </Text>
-                <Text className='text-orange-500 font-bold text-lg'>
+
+                <Text className="text-orange-500 font-bold text-lg">
                   ₹{order.totalAmount}
                 </Text>
               </View>

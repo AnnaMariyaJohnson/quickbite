@@ -1,15 +1,16 @@
-import React, { useState ,useEffect} from 'react';
-import {View,Text,TouchableOpacity,ScrollView,Alert, ActivityIndicator} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useCartStore } from '../../store/cartStore';
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { addressApi } from '../../api/addressApi';
+import { orderApi } from '../../api/orderApi';
 import { RootStackParamList } from '../../navigation/types';
-import {orderApi} from '../../api/orderApi';
+import { useAuthStore } from '../../store/authStore';
+import { useCartStore } from '../../store/cartStore';
 import { useOrderStore } from '../../store/orderStore';
-import {addressApi} from '../../api/addressApi';
-import {Address} from '../../types/address';
-import {useAuthStore} from '../../store/authStore';
+import { Address } from '../../types/address';
 
 export default function CheckoutSCreen(){
     const {items,totalPrice,clearCart}=useCartStore();
@@ -55,9 +56,20 @@ export default function CheckoutSCreen(){
 
         try{
             setLoading(true);
-            const order= await orderApi.createOrder({
-                totalAmount:totalPrice,
-            });
+            const selectedAddress =
+                addresses.find(
+                    a => a.id === selectedAddressId,
+                );
+
+                const order =
+                await orderApi.createOrder({
+                    totalAmount: totalPrice,
+                    addressId: selectedAddressId,
+                    deliveryAddress:
+                    `${selectedAddress?.addressLine},
+                    ${selectedAddress?.city},
+                    ${selectedAddress?.state}`,
+                });
         addOrder(order);
 
         clearCart();

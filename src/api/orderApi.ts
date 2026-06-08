@@ -1,8 +1,10 @@
-import api from './axios';
 import { Order } from '../types/order';
+import api from './axios';
 
 export interface CreateOrderRequest {
     totalAmount:number;
+    addressId:string;
+    deliveryAddress:string;
 }
 
 export const orderApi={

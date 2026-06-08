@@ -57,9 +57,9 @@ export default function ProfileScreen() {
           </View>
           <Text className="text-white text-2xl font-bold">{user.name}</Text>
           <Text className="text-zinc-400">{user.email}</Text>
-          <Text className='text-zinc-500 text-xs mt-2'>
+          {/* <Text className='text-zinc-500 text-xs mt-2'>
             ID:{user.id}
-          </Text>
+          </Text> */}
           <TouchableOpacity
             className="bg-orange-600 px-6 py-2 rounded-xl mt-4"
             onPress={() =>
