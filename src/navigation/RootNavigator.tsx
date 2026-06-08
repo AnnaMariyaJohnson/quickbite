@@ -21,6 +21,7 @@ import SearchScreen from '../screens/tabs/SearchScreen';
 import { useAuthStore } from '../store/authStore';
 import { useCartStore } from '../store/cartStore';
 import { RootStackParamList, TabParamList } from './types';
+import FavoritesScreen from '../screens/profile/FavoritesScreen';
 
 const Tab = createBottomTabNavigator<TabParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -144,6 +145,10 @@ export default function RootNavigator() {
       <Stack.Screen
         name="EditAddress"
         component={EditAddressScreen}
+      />
+      <Stack.Screen
+        name="Favorites"
+        component={FavoritesScreen}
       />
     </Stack.Navigator>
     

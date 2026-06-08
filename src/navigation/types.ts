@@ -26,6 +26,7 @@ export type RootStackParamList={
     EditAddress: {
     id: string;
     };
+    Favorites:undefined;
 }
 
 export type TabParamList={

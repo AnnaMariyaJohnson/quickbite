@@ -75,6 +75,7 @@ export default function ProfileScreen() {
         <View className="px-4 mt-6">
           {/* Menu Items */}
           {[
+            { title: 'My Addresses', icon: 'location-on' },
             { title: 'Payment Methods', icon: 'payment' },
             { title: 'Favorites', icon: 'favorite' },
             { title: 'Order History', icon: 'history' },
@@ -93,6 +94,10 @@ export default function ProfileScreen() {
                     screen: 'Orders',
                   });
                   break;
+
+                  case 'Favorites':
+                    navigation.navigate('Favorites');
+                    break;
 
                 default:
                   break;

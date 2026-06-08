@@ -19,6 +19,9 @@ import {
 } from '../../navigation/types';
 import { useCartStore } from '../../store/cartStore';
 import { MenuItem } from '../../types';
+import { favoriteApi } from '../../api/favoriteApi';
+import {useAuthStore} from '../../store/authStore';
+import { FavoriteMenuItem } from '../../types/favorite';
 
 export default function RestaurantScreen({
   route,
@@ -33,7 +36,10 @@ export default function RestaurantScreen({
   const [menu, setMenu] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-
+  const user=useAuthStore(state=>state.user);
+  const [isFavorite,setIsFavorite]=useState(false);
+  const [favoriteId,setFavoriteId]=useState('');
+  const [favoriteMenus,setFavoriteMenus]=useState<FavoriteMenuItem[]>([]);
 
   const fetchMenu = useCallback(async () => {
     try {
@@ -47,14 +53,105 @@ export default function RestaurantScreen({
     }
   }, [restaurant.id]);
 
+  const loadFavoriteStatus= useCallback(async()=>{
+    if(!user?.id){
+      return;
+    }
+    try{
+      const favorites=await favoriteApi.getFavoriteRestaurants(user.id);
+      const existing=favorites.find(
+        x=>x.restaurantId === restaurant.id
+      );
+      if(existing){
+        setIsFavorite(true);
+        setFavoriteId(existing.favoriteId);
+      }
+    }catch(error){
+      console.error(error);
+    }
+  },[user?.id,restaurant.id]);
+
+  const loadMenuFavorites=useCallback(async()=>{
+    if(!user?.id){
+      return;
+    }
+    try{
+      const favorites=
+      await favoriteApi.getFavoriteMenuItems(user.id);
+      setFavoriteMenus(favorites);
+    }catch(error){
+      console.error(error);
+    }
+  },[user?.id]);
+
   useEffect(() => {
     fetchMenu();
-  }, [fetchMenu]);
+    loadFavoriteStatus();
+    loadMenuFavorites();
+  }, [fetchMenu,loadFavoriteStatus,loadMenuFavorites]);
 
   const onRefresh = async () => {
     setRefreshing(true);
     await fetchMenu();
     setRefreshing(false);
+  };
+  
+  const toggleRestaurantFavorite=
+    async()=>{
+      try{
+        if(!user?.id){
+          return;
+        }
+        if(isFavorite){
+          await favoriteApi.removeFavorite(favoriteId);
+          setIsFavorite(false);
+          setFavoriteId('');
+        }else{
+          await favoriteApi.addFavorite({
+            userId:user.id,
+            restaurantId:restaurant.id
+          });
+          setIsFavorite(true);
+        }
+      }catch(error){
+        console.error(error);
+      }
+    };
+
+  const toggleMenuFavorite = async (
+    menuItemId: string,
+  ) => {
+    try {
+      if (!user?.id) {
+        return;
+      }
+
+      const existing =
+        favoriteMenus.find(
+          x => x.menuItemId === menuItemId,
+        );
+
+      if (existing) {
+        await favoriteApi.removeFavorite(
+          existing.favoriteId,
+        );
+
+        setFavoriteMenus(prev =>
+          prev.filter(
+            x => x.menuItemId !== menuItemId,
+          ),
+        );
+      } else {
+        await favoriteApi.addFavorite({
+          userId: user.id,
+          menuItemId,
+        });
+
+        await loadMenuFavorites();
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleAddToCart = (item: MenuItem) => {
@@ -110,6 +207,21 @@ export default function RestaurantScreen({
             <Text className="text-white text-3xl font-bold flex-1 pr-2">
               {restaurant.name}
             </Text>
+
+            <TouchableOpacity
+              onPress={
+                toggleRestaurantFavorite
+              }>
+              <Icon
+                name={
+                  isFavorite
+                    ? 'favorite'
+                    : 'favorite-border'
+                }
+                size={28}
+                color="#F97316"
+              />
+            </TouchableOpacity>
 
             <View className="bg-green-600 px-3 py-1 rounded-lg">
               <Text className="text-white font-semibold">
@@ -171,14 +283,35 @@ export default function RestaurantScreen({
                 </View>
 
                 {/* RIGHT BUTTON */}
-                <TouchableOpacity
-                  onPress={() => handleAddToCart(item)}
-                  className="bg-orange-600 px-5 py-3 rounded-xl"
-                >
-                  <Text className="text-white font-semibold">
-                    Add
-                  </Text>
-                </TouchableOpacity>
+                <View className="flex-row items-center">
+                  <TouchableOpacity
+                    onPress={() =>
+                      toggleMenuFavorite(item.id)
+                    }
+                    className="mr-3"
+                  >
+                    <Icon
+                      name={
+                        favoriteMenus.some(
+                          x=>x.menuItemId===item.id,
+                        )
+                          ? 'favorite'
+                          : 'favorite-border'
+                      }
+                      size={24}
+                      color="#F97316"
+                    />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={() => handleAddToCart(item)}
+                    className="bg-orange-600 px-5 py-3 rounded-xl"
+                  >
+                    <Text className="text-white font-semibold">
+                      Add
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             ))
           )}

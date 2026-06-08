@@ -6,6 +6,7 @@ import {
     Text,
     TextInput,
     TouchableOpacity,
+    View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -58,14 +59,15 @@ export default function AddAddressScreen() {
   return (
     <SafeAreaView className="flex-1 bg-zinc-950">
       <ScrollView className="p-4">
+         <View className="flex-row items-center px-4 py-4 border-b border-zinc-800">
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Icon name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
 
-        <Text className="text-white text-3xl font-bold mt-4">
+        <Text className="text-white text-2xl font-bold ml-4">
           Add Address
         </Text>
-
+        </View>
         <TextInput
           placeholder="Home / Work"
           placeholderTextColor="#71717A"
