@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState ,useEffect} from 'react';
 import {View,Text,TouchableOpacity,ScrollView,Alert, ActivityIndicator} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCartStore } from '../../store/cartStore';
@@ -7,12 +7,34 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/types';
 import {orderApi} from '../../api/orderApi';
 import { useOrderStore } from '../../store/orderStore';
+import {addressApi} from '../../api/addressApi';
+import {Address} from '../../types/address';
+import {useAuthStore} from '../../store/authStore';
 
 export default function CheckoutSCreen(){
     const {items,totalPrice,clearCart}=useCartStore();
     const addOrder = useOrderStore(state => state.addOrder);
     const navigation=useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const[loading,setLoading]=useState(false);
+    const user=useAuthStore(state=>state.user);
+    const[addresses, setAddresses]=useState<Address[]>([]);
+    const[selectedAddressId,setSelectedAddressId]=useState('');
+
+    useEffect(()=>{
+        loadAddresses();
+    },[]);
+
+    const loadAddresses=async()=>{
+        try{
+            if(!user?.id){
+                return;
+            }
+            const data=await addressApi.getByUserId(user.id);
+            setAddresses(data);
+        }catch(error){
+            console.error(error);
+        }
+    };
 
     const handlePlaceOrder=async()=>{
          if (items.length === 0) {
@@ -22,6 +44,14 @@ export default function CheckoutSCreen(){
             );
             return;
             }
+
+        if(!selectedAddressId){
+            Alert.alert(
+                'Address Required',
+                'Please select a delivery address'
+            );
+            return;
+        }
 
         try{
             setLoading(true);
@@ -62,6 +92,55 @@ export default function CheckoutSCreen(){
                 <Text className='text-white text-3xl font-bold'>
                     Checkout
                 </Text>
+                <Text className="text-white text-xl font-semibold mt-6 mb-3">
+                Delivery Address
+                </Text>
+                {
+                addresses.map(address => (
+                    <TouchableOpacity
+                    key={address.id}
+                    onPress={() =>
+                        setSelectedAddressId(address.id)
+                    }
+                    className={`p-4 rounded-2xl mb-3 ${
+                        selectedAddressId === address.id
+                        ? 'bg-orange-600'
+                        : 'bg-zinc-900'
+                    }`}
+                    >
+                    <Text className="text-white font-bold">
+                        {address.type}
+                    </Text>
+
+                    <Text className="text-zinc-300">
+                        {address.addressLine}
+                    </Text>
+
+                    <Text className="text-zinc-400">
+                        {address.city},
+                        {address.state}
+                    </Text>
+                    </TouchableOpacity>
+                ))
+                }
+                {/* Empty Address Case */}
+               {addresses.length === 0 && (
+                <View className="bg-zinc-900 p-4 rounded-xl mb-4">
+                    <Text className="text-white text-center mb-3">
+                    No delivery address found
+                    </Text>
+
+                    <TouchableOpacity
+                    onPress={() => navigation.navigate('AddAddress')}
+                    className="bg-orange-600 p-3 rounded-xl"
+                    >
+                    <Text className="text-white text-center">
+                        Add Address
+                    </Text>
+                    </TouchableOpacity>
+                </View>
+                )}
+
                 <View className='mt-6'>
                     {items.map(item=>(
                         <View
