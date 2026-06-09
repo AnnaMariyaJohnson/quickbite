@@ -16,5 +16,10 @@ export const menuApi={
             `/Menu/restaurant/${restaurantId}`
         );
         return response.data;
+    },
+
+    getCategories:async()=>{
+        const response=await api.get('/Menu/categories');
+        return response.data;
     }
 }

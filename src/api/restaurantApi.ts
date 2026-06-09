@@ -13,5 +13,9 @@ export const restaurantApi={
     search:async(query:string)=>{
       const response=await api.get(`/Restaurant/search-all?query=${query}`);
       return response.data;
+    },
+    getByCategory:async(category:string)=>{
+      const response=await api.get(`/Restaurant/category/${category}`);
+      return response.data;
     }
 }
