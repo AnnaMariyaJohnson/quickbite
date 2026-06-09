@@ -96,7 +96,7 @@ export default function RootNavigator() {
 
    useEffect(()=>{
     loadStoredUser();
-   },[]);
+   },[loadStoredUser]);
    
    if(isLoading){
     return(

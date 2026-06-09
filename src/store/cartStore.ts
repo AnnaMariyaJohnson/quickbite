@@ -72,12 +72,12 @@ export const useCartStore = create<CartStore>()(
         }
 
         const totalItems = newItems.reduce(
-          (sum, item) => sum + item.quantity,
+          (sum, cartItem) => sum + cartItem.quantity,
           0
         );
 
         const totalPrice = newItems.reduce(
-          (sum, item) => sum + item.price * item.quantity,
+          (sum, cartItem) => sum + cartItem.price * cartItem.quantity,
           0
         );
 
@@ -95,12 +95,12 @@ export const useCartStore = create<CartStore>()(
         );
 
         const totalItems = newItems.reduce(
-          (sum, item) => sum + item.quantity,
+          (sum, cartItem) => sum + cartItem.quantity,
           0
         );
 
         const totalPrice = newItems.reduce(
-          (sum, item) => sum + item.price * item.quantity,
+          (sum, cartItem) => sum + cartItem.price * cartItem.quantity,
           0
         );
 
@@ -122,12 +122,12 @@ export const useCartStore = create<CartStore>()(
         );
 
         const totalItems = newItems.reduce(
-          (sum, item) => sum + item.quantity,
+          (sum, cartItem) => sum + cartItem.quantity,
           0
         );
 
         const totalPrice = newItems.reduce(
-          (sum, item) => sum + item.price * item.quantity,
+          (sum, cartItem) => sum + cartItem.price * cartItem.quantity,
           0
         );
 
@@ -152,12 +152,12 @@ export const useCartStore = create<CartStore>()(
           .filter(item => item.quantity > 0);
 
         const totalItems = newItems.reduce(
-          (sum, item) => sum + item.quantity,
+          (sum, cartItem) => sum + cartItem.quantity,
           0
         );
 
         const totalPrice = newItems.reduce(
-          (sum, item) => sum + item.price * item.quantity,
+          (sum, cartItem) => sum + cartItem.price * cartItem.quantity,
           0
         );
 

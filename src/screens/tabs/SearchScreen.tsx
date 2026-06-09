@@ -1,12 +1,12 @@
 // src/screens/tabs/SearchScreen.tsx
-import React, { useState, useEffect, } from 'react';
+import React, { useState, useEffect,useCallback } from 'react';
 import { View, Text, TextInput, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/types';
 import { restaurantApi } from '../../api/restaurantApi';
-import {menuApi} from '../../api/menuApi';
+
 import { MenuItem, Restaurant } from '../../types';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -18,8 +18,6 @@ type SearchResult={
 
 export default function SearchScreen() {
   const [searchText, setSearchText] = useState('');
-  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  const [menus,setMenus]=useState<Record<string,MenuItem[]>>({});
   const [searchResults,setSearchResults]=useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [searching,setSearching]=useState(false);
@@ -34,11 +32,12 @@ export default function SearchScreen() {
     try {
       setLoading(true);
       const data = await restaurantApi.getAll();
-      setRestaurants(data);
-      setSearchResults(data.map(r=>({
-        type:'restaurant',
-        restaurant:r
-      })));
+      setSearchResults(
+        data.map(r => ({
+          type: 'restaurant',
+          restaurant: r,
+        }))
+      );
     } catch (error) {
       console.error('Failed to load restaurants:', error);
     } finally {
@@ -46,76 +45,71 @@ export default function SearchScreen() {
     }
   };
 
-  useEffect(() => {
-    if (!searchText.trim()) {
-      setSearchResults(restaurants.map(r=>({
-        type:'restaurant',restaurant:r
-      })));
-      return;
-    }
+  const searchRestaurants = useCallback(async () => {
+    try {
+      if (!searchText.trim()) {
+        const data =
+          await restaurantApi.getAll();
 
-    const query=searchText.toLowerCase().trim();
-    const results:SearchResult[]=[];
-    const processedRestaurants=new Set<string>();
+        setSearchResults(
+          data.map(r => ({
+            type: 'restaurant',
+            restaurant: r,
+          }))
+        );
 
-    restaurants.forEach(restaurant=>{
-      
-      if(
-        restaurant.name.toLowerCase().includes(query) ||
-        restaurant.description.toLowerCase().includes(query)
-      ){
-        results.push({type:'restaurant',restaurant});       
+        return;
       }
-      // Search in menu items 
-      const restaurantMenu=menus[restaurant.id];
-      if(restaurantMenu){
-        restaurantMenu.forEach(dish=>{
-          if(
-            dish.name.toLowerCase().includes(query)||
-            (dish.description && dish.description.toLowerCase().includes(query))
-          ){
-            results.push({
-              type:'dish',
-              restaurant,
-              dish
-            });
-          }
-        })
-      }    
-    });
-    setSearchResults(results);
-  }, [searchText, restaurants,menus]);
 
-  //Fetch menu when user starts searching for dishes
-  const fetchMenuForRestaurant=async(restaurantId:string)=>{
-    if(menus[restaurantId]) return; //Already fetched
-    try{
       setSearching(true);
-      const menuItems=await menuApi.getByRestaurantId(restaurantId);
-      setMenus(prev=>({...prev,[restaurantId]:menuItems}));
+
+      const results =
+        await restaurantApi.search(
+          searchText
+        );
+
+      setSearchResults(results);
     } catch (error) {
-      console.error('Failed to fetch menu for restaurant:', error);
+      console.error(
+        'Search failed:',
+        error
+      );
     } finally {
       setSearching(false);
     }
-  }
+  }, [searchText]);
 
-  useEffect(()=>{
-    if(searchText.trim().length<2) return;
-    const timer=setTimeout(()=>{
-      restaurants.forEach(r=>fetchMenuForRestaurant(r.id));
-    },300);
-    return()=>clearTimeout(timer);
-  },[searchText])
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      searchRestaurants();
+    }, 500);
 
-  const handlePress = (result: SearchResult) => {
-    navigation.navigate('Restaurant', { 
-      restaurant:{
-        id:result.restaurant.id,
-        name:result.restaurant.name,
-        address:result.restaurant.address,
-        description:result.restaurant.description,
-      } });
+    return () => clearTimeout(timer);
+  }, [searchRestaurants]);
+
+  const handlePress = (
+    result: SearchResult
+  ) => {
+    navigation.navigate(
+      'Restaurant',
+      {
+        restaurant: {
+          id: result.restaurant.id,
+          name:
+            result.restaurant.name,
+          address:
+            result.restaurant.address,
+          description:
+            result.restaurant
+              .description,
+          imageUrl:
+            result.restaurant
+              .imageUrl,
+          rating:
+            result.restaurant.rating,
+        },
+      }
+    );
   };
 
   return (
@@ -140,60 +134,139 @@ export default function SearchScreen() {
         </View>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false} className="flex-1 p-4">
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        className="flex-1 p-4"
+      >
         {loading ? (
           <View className="flex-1 justify-center items-center mt-20">
-            <ActivityIndicator size="large" color="#FF3D00" />
+
+            <ActivityIndicator
+              size="large"
+              color="#FF3D00"
+            />
+
           </View>
         ) : (
           <>
-            {searchResults.length === 0 ? (
+            {searchResults.length ===
+            0 ? (
               <View className="items-center py-20">
-                <Icon name="search-off" size={80} color="#3f3f46" />
-                <Text className="text-white text-2xl font-semibold mt-6">No results found</Text>
-                <Text className="text-zinc-400 text-center mt-3">Try different keywords</Text>
+
+                <Icon
+                  name="search-off"
+                  size={80}
+                  color="#3f3f46"
+                />
+
+                <Text className="text-white text-2xl font-semibold mt-6">
+                  No results found
+                </Text>
+
+                <Text className="text-zinc-400 text-center mt-3">
+                  Try different keywords
+                </Text>
               </View>
             ) : (
               <>
                 <Text className="text-zinc-400 mb-4 px-1">
-                  {searchText ? `Found ${searchResults.length} results` : 'All Restaurants'}
+                  {searchText
+                    ? `Found ${searchResults.length} results`
+                    : 'All Restaurants'}
                 </Text>
 
-                {searchResults.map((result, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    onPress={() => handlePress(result)}
-                    className="bg-zinc-900 rounded-3xl overflow-hidden mb-4 active:opacity-90"
-                  >
-                    <View className="p-4">
-                      <View className="flex-row justify-between items-start">
-                        <Text className="text-white text-lg font-semibold flex-1">
-                          {result.restaurant.name}
-                        </Text>
-                      </View>
-                      <Text 
-                        className="text-zinc-400 mt-1"
-                        numberOfLines={2}>
-                          {result.restaurant.description}
-                      </Text>
-                      <Text className="text-zinc-500 mt-2">
-                        {result.restaurant.address}
-                      </Text>
+                {searchResults.map(
+                  (
+                    result,
+                    index
+                  ) => (
+                    <TouchableOpacity
+                      key={index}
+                      onPress={() =>
+                        handlePress(
+                          result
+                        )
+                      }
+                      className="bg-zinc-900 rounded-3xl overflow-hidden mb-4"
+                    >
+                      <View className="p-4">
 
-                        {/* Show matched dish if any */}
-                    {result.dish && (
-                      <View className="mt-2 bg-zinc-800 rounded-xl p-3">
-                        <Text className="text-orange-400 font-medium">Matching Dish:</Text>
-                        <Text className="text-white font-semibold">{result.dish.name}</Text>
-                        <Text className="text-emerald-400">₹{result.dish.price}</Text>
+                        <View className="flex-row justify-between items-start">
+
+                          <Text className="text-white text-lg font-semibold flex-1">
+                            {
+                              result
+                                .restaurant
+                                .name
+                            }
+                          </Text>
+
+                        </View>
+
+                        <Text
+                          className="text-zinc-400 mt-1"
+                          numberOfLines={2}
+                        >
+                          {
+                            result
+                              .restaurant
+                              .description
+                          }
+                        </Text>
+
+                        <Text className="text-zinc-500 mt-2">
+                          {
+                            result
+                              .restaurant
+                              .address
+                          }
+                        </Text>
+
+                        {result.dish && (
+                          <View className="mt-3 bg-zinc-800 rounded-xl p-3">
+
+                            <Text className="text-orange-400 font-medium">
+                              Matching Dish
+                            </Text>
+
+                            <Text className="text-white font-semibold mt-1">
+                              {
+                                result
+                                  .dish
+                                  .name
+                              }
+                            </Text>
+
+                            <Text className="text-zinc-400">
+                              {
+                                result
+                                  .dish
+                                  .description
+                              }
+                            </Text>
+
+                            <Text className="text-emerald-400 font-bold mt-1">
+                              ₹
+                              {
+                                result
+                                  .dish
+                                  .price
+                              }
+                            </Text>
+
+                          </View>
+                        )}
+
                       </View>
-                    )}
-                    </View>
-                  </TouchableOpacity>
-                ))}
+                    </TouchableOpacity>
+                  )
+                )}
+
                 {searching && (
-              <Text className="text-center text-zinc-400 py-4">Searching dishes...</Text>
-            )}
+                  <Text className="text-center text-zinc-400 py-4">
+                    Searching...
+                  </Text>
+                )}
               </>
             )}
           </>

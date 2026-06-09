@@ -10,4 +10,8 @@ export const restaurantApi={
       const response=await api.get(`/Restaurant/${id}`);
       return response.data;
     },
+    search:async(query:string)=>{
+      const response=await api.get(`/Restaurant/search-all?query=${query}`);
+      return response.data;
+    }
 }

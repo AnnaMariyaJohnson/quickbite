@@ -1,4 +1,5 @@
 import React, {
+  useCallback,
   useEffect,
   useState,
 } from 'react';
@@ -53,11 +54,7 @@ export default function FavoritesScreen({
     [],
   );
 
-  useEffect(() => {
-    loadFavorites();
-  }, []);
-
-  const loadFavorites = async () => {
+  const loadFavorites = useCallback(async () => {
     if (!user?.id) {
       return;
     }
@@ -78,7 +75,12 @@ export default function FavoritesScreen({
     } catch (error) {
       console.error(error);
     }
-  };
+  },[user?.id]);
+
+   useEffect(() => {
+    loadFavorites();
+  }, [loadFavorites]);
+
 
   return (
     <SafeAreaView className="flex-1 bg-zinc-950">
