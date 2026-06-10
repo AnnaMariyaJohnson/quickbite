@@ -263,7 +263,7 @@ export default function OrderDetailsScreen() {
           >
             <View>
               <Text className="text-white font-semibold">
-                {item.menuItem?.name}
+                {item.menuItemName}
               </Text>
 
               <Text className="text-zinc-400">

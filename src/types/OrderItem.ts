@@ -3,8 +3,6 @@ export interface OrderItem{
     menuItemId:string;
     quantity:number;
     price:number;
-    menuItem?:{
-        name:string;
-        imageUrl:string;
-    }
+    menuItemName?:string;
+    menuItemImage?:string;
 }
