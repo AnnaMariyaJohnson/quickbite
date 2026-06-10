@@ -32,7 +32,9 @@ export default function RestaurantScreen({
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const addToCart = useCartStore(state => state.addToCart);
-
+  const cartItems=useCartStore(state=>state.items);
+  const increaseQuantity=useCartStore(state=>state.increaseQuantity);
+  const decreaseQuantity=useCartStore(state=>state.decreaseQuantity);
   const [menu, setMenu] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -165,6 +167,13 @@ export default function RestaurantScreen({
       restaurant.id,
     );
   };
+
+  const getItemQuantity=(itemId:string,)=>{
+    const cartItem=cartItems.find(
+      x=>x.id === itemId,
+    );
+    return cartItem?.quantity || 0;
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-zinc-950">
@@ -303,14 +312,41 @@ export default function RestaurantScreen({
                     />
                   </TouchableOpacity>
 
-                  <TouchableOpacity
-                    onPress={() => handleAddToCart(item)}
-                    className="bg-orange-600 px-5 py-3 rounded-xl"
-                  >
-                    <Text className="text-white font-semibold">
-                      Add
-                    </Text>
-                  </TouchableOpacity>
+                  {getItemQuantity(item.id)> 0 ? (
+                    <View className='flex-row items-center bg-orange-600 rounded-xl'>
+                      <TouchableOpacity
+                        onPress={()=>
+                          decreaseQuantity(item.id)
+                        }
+                        className='px-3 py-2'>
+                          <Text className='text-white text-xl font-bold'>
+                            -
+                          </Text>
+                        </TouchableOpacity>
+                        <Text className='text-white font-bold px-2'>
+                          {getItemQuantity(item.id)}
+                        </Text>
+                        <TouchableOpacity
+                          onPress={()=>
+                            increaseQuantity(item.id)
+                          }
+                          className='px-3 py-2'>
+                            <Text className='text-white text-xl font-bold'>
+                              +
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                  ):(
+                    <TouchableOpacity
+                      onPress={()=>
+                        handleAddToCart(item)
+                      }
+                      className='bg-orange-600 px-5 py-3 rounded-xl'>
+                        <Text className='text-white font-semibold'>
+                          Add
+                        </Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
               </View>
             ))
