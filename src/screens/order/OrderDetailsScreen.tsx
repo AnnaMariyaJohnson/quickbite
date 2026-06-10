@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ScrollView,
   Text,
@@ -8,17 +8,15 @@ import {
 import {
   SafeAreaView,
 } from 'react-native-safe-area-context';
-
 import {
   RouteProp,
   useNavigation,
   useRoute,
 } from '@react-navigation/native';
-
 import Icon from 'react-native-vector-icons/MaterialIcons';
-
 import { RootStackParamList } from '../../navigation/types';
-import { useOrderStore } from '../../store/orderStore';
+import {orderApi} from '../../api/orderApi';
+import { RefreshControl } from 'react-native';
 
 type OrderDetailsRouteProp = RouteProp<
   RootStackParamList,
@@ -29,14 +27,10 @@ export default function OrderDetailsScreen() {
   const route =
     useRoute<OrderDetailsRouteProp>();
   const navigation = useNavigation();
-
   const { orderId } = route.params;
-
-  const order = useOrderStore(state =>
-    state.orders.find(
-      o => o.id === orderId,
-    ),
-  );
+  const [order, setOrder] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing]=useState(false);
 
   const formatDate = (
     date?: string,
@@ -45,16 +39,52 @@ export default function OrderDetailsScreen() {
       return 'Unknown date';
     }
 
-    const parsed = new Date(date);
-
+  const parsed = new Date(date);
     if (
       isNaN(parsed.getTime())
     ) {
       return 'Unknown date';
     }
-
     return parsed.toDateString();
   };
+  
+    const onRefresh=async()=>{
+      setRefreshing(true);
+      await loadOrder();
+      setRefreshing(false);
+    };
+  
+   const loadOrder=async()=>{
+      try{
+        const data=await orderApi.getOrderById(orderId);
+        setOrder(data);
+      }catch(error){
+        console.error(error);
+      }finally{
+        setLoading(false);
+      }
+    };
+
+    useEffect(()=>{
+      loadOrder();
+    },[]);
+
+    useEffect(()=>{
+      const interval =setInterval(()=>{
+        loadOrder();
+      },10000);
+      return ()=>clearInterval(interval);
+    },[]);
+
+  if(loading){
+    return(
+      <SafeAreaView className='flex-1 bg-zinc-950 justify-center items-center'>
+        <Text className='text-white'>
+          Loading...
+        </Text>
+      </SafeAreaView>
+    );
+  }
 
   if (!order) {
     return (
@@ -68,7 +98,14 @@ export default function OrderDetailsScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-zinc-950">
-      <ScrollView className="p-4">
+      <ScrollView 
+      className="p-4"
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          colors={['#f97316']}/>
+      }>
 
         {/* Header */}
         <View className="flex-row items-center mb-6">
@@ -137,16 +174,78 @@ export default function OrderDetailsScreen() {
 
         </View>
 
-        {/* Status */}
+        {/* Order Tracking */}
         <View className="bg-zinc-900 rounded-2xl p-5 mt-4">
-
-          <Text className="text-zinc-400">
-            Status
+          <Text className="text-white text-lg font-bold mb-5">
+            Order Tracking
           </Text>
 
-          <Text className="text-orange-500 text-lg font-semibold mt-2">
-            {order.status}
-          </Text>
+          {/* Order Placed */}
+          <View className="flex-row items-center mb-4">
+            <Icon
+              name="check-circle"
+              size={22}
+              color={
+                ['OrderPlaced', 'Preparing', 'OutForDelivery', 'Delivered']
+                  .includes(order.status)
+                  ? '#22C55E'
+                  : '#52525B'
+              }
+            />
+            <Text className="text-white ml-3">
+              Order Placed
+            </Text>
+          </View>
+
+          {/* Preparing */}
+          <View className="flex-row items-center mb-4">
+            <Icon
+              name="restaurant"
+              size={22}
+              color={
+                ['Preparing', 'OutForDelivery', 'Delivered']
+                  .includes(order.status)
+                  ? '#22C55E'
+                  : '#52525B'
+              }
+            />
+            <Text className="text-white ml-3">
+              Preparing Food
+            </Text>
+          </View>
+
+          {/* Out For Delivery */}
+          <View className="flex-row items-center mb-4">
+            <Icon
+              name="delivery-dining"
+              size={22}
+              color={
+                ['OutForDelivery', 'Delivered']
+                  .includes(order.status)
+                  ? '#22C55E'
+                  : '#52525B'
+              }
+            />
+            <Text className="text-white ml-3">
+              Out For Delivery
+            </Text>
+          </View>
+
+          {/* Delivered */}
+          <View className="flex-row items-center">
+            <Icon
+              name="home"
+              size={22}
+              color={
+                order.status === 'Delivered'
+                  ? '#22C55E'
+                  : '#52525B'
+              }
+            />
+            <Text className="text-white ml-3">
+              Delivered
+            </Text>
+          </View>
 
         </View>
 

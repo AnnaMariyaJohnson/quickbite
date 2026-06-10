@@ -6,13 +6,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { orderApi } from '../../api/orderApi';
 import { RootStackParamList } from '../../navigation/types';
 import { useOrderStore } from '../../store/orderStore';
+import { RefreshControl } from 'react-native';
 
 export default function OrdersScreen() {
   const orders = useOrderStore(state => state.orders);
   const setOrders = useOrderStore(state => state.setOrders);
   const [loading,setLoading]=useState(true);
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-
+  const [refreshing, setRefreshing] = useState(false);
 
   const loadOrders = useCallback(async () => {
   try {
@@ -28,6 +29,12 @@ export default function OrdersScreen() {
   useEffect(() => {
     loadOrders();
   }, [loadOrders]);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadOrders();
+    setRefreshing(false);
+  };
 
   const formatDate=(date?:string)=>{
     if(!date)return "Unknown date";
@@ -55,7 +62,15 @@ export default function OrdersScreen() {
         <Text className="text-white text-3xl font-bold">My Orders</Text>
       </View>
 
-      <ScrollView className="flex-1 px-4 mt-6" showsVerticalScrollIndicator={false}>
+      <ScrollView 
+      className="flex-1 px-4 mt-6" 
+      showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={['#f97316']}/>
+      }>
        {orders.length===0 ?(
         <View className='flex-1 justify-center items-center mt-20'>
           <Text className='text-zinc-400 text-lg'>
