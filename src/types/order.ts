@@ -1,3 +1,5 @@
+import { OrderItem } from "./OrderItem";
+
 export interface Order {
     id:string;
     userId:string;
@@ -6,4 +8,5 @@ export interface Order {
     deliveryAddress:string;
     createdAt:string;
     status: string;
+    orderItems?:OrderItem[];
 }

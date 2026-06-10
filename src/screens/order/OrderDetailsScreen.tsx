@@ -17,6 +17,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { RootStackParamList } from '../../navigation/types';
 import {orderApi} from '../../api/orderApi';
 import { RefreshControl } from 'react-native';
+import {Order} from '../../types/order';
 
 type OrderDetailsRouteProp = RouteProp<
   RootStackParamList,
@@ -28,7 +29,7 @@ export default function OrderDetailsScreen() {
     useRoute<OrderDetailsRouteProp>();
   const navigation = useNavigation();
   const { orderId } = route.params;
-  const [order, setOrder] = useState<any>(null);
+  const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing]=useState(false);
 
@@ -255,14 +256,14 @@ export default function OrderDetailsScreen() {
             Ordered Items
           </Text>
 
-         {order.orderItems?.map((item: any) => (
+         {order.orderItems?.map((item) => (
           <View
             key={item.id}
             className="flex-row justify-between items-center mb-3"
           >
             <View>
               <Text className="text-white font-semibold">
-                {item.menuItemName}
+                {item.menuItem?.name}
               </Text>
 
               <Text className="text-zinc-400">
