@@ -95,7 +95,7 @@ export default function OrdersScreen() {
               </Text>
               <View className='mt-3'>
                 <Text className='text-orange-400'>
-                  Order Placed
+                  {order.status}
                 </Text>
               </View>
             </TouchableOpacity>

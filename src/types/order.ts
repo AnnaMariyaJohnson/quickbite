@@ -5,4 +5,5 @@ export interface Order {
     addressId:string;
     deliveryAddress:string;
     createdAt:string;
+    status: string;
 }

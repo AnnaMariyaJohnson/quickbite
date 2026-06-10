@@ -120,8 +120,8 @@ export default function OrderDetailsScreen() {
             Delivery Address
           </Text>
 
-          <Text className="text-white">
-            {order.deliveryAddress}
+          <Text className="text-white leading-6">
+            {order.deliveryAddress?.replace(/,\s*/g, '\n')}
           </Text>
 
           <Text className="text-zinc-400 mt-5">
@@ -145,7 +145,7 @@ export default function OrderDetailsScreen() {
           </Text>
 
           <Text className="text-orange-500 text-lg font-semibold mt-2">
-            Order Placed
+            {order.status}
           </Text>
 
         </View>
