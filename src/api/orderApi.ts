@@ -5,6 +5,11 @@ export interface CreateOrderRequest {
     totalAmount:number;
     addressId:string;
     deliveryAddress:string;
+    items:{
+        menuItemId:string;
+        quantity:number;
+        price:number;
+    }[];
 }
 
 export const orderApi={

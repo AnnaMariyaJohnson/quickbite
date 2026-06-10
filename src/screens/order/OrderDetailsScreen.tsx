@@ -249,6 +249,34 @@ export default function OrderDetailsScreen() {
 
         </View>
 
+        {/* Ordered Items */}
+        <View className="bg-zinc-900 rounded-2xl p-5 mt-4">
+          <Text className="text-white text-lg font-bold mb-4">
+            Ordered Items
+          </Text>
+
+         {order.orderItems?.map((item: any) => (
+          <View
+            key={item.id}
+            className="flex-row justify-between items-center mb-3"
+          >
+            <View>
+              <Text className="text-white font-semibold">
+                {item.menuItemName}
+              </Text>
+
+              <Text className="text-zinc-400">
+                Qty: {item.quantity}
+              </Text>
+            </View>
+
+            <Text className="text-orange-500 font-bold">
+              ₹{item.price}
+            </Text>
+          </View>
+        ))}
+        </View>
+
         {/* Total */}
         <View className="bg-zinc-900 rounded-2xl p-5 mt-4">
 

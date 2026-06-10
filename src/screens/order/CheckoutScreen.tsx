@@ -69,6 +69,11 @@ export default function CheckoutSCreen(){
                     `${selectedAddress?.addressLine},
                     ${selectedAddress?.city},
                     ${selectedAddress?.state}`,
+                    items:items.map(item=>({
+                        menuItemId:item.id,
+                        quantity:item.quantity,
+                        price:item.price,
+                    })),
                 });
         addOrder(order);
 
