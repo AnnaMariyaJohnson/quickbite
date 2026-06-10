@@ -1,5 +1,11 @@
-import React, { useEffect, useState } from 'react';
 import {
+  RouteProp,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
+import React, { useCallback, useEffect, useState } from 'react';
+import {
+  RefreshControl,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -8,16 +14,10 @@ import {
 import {
   SafeAreaView,
 } from 'react-native-safe-area-context';
-import {
-  RouteProp,
-  useNavigation,
-  useRoute,
-} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { orderApi } from '../../api/orderApi';
 import { RootStackParamList } from '../../navigation/types';
-import {orderApi} from '../../api/orderApi';
-import { RefreshControl } from 'react-native';
-import {Order} from '../../types/order';
+import { Order } from '../../types/order';
 
 type OrderDetailsRouteProp = RouteProp<
   RootStackParamList,
@@ -55,27 +55,28 @@ export default function OrderDetailsScreen() {
       setRefreshing(false);
     };
   
-   const loadOrder=async()=>{
-      try{
-        const data=await orderApi.getOrderById(orderId);
-        setOrder(data);
-      }catch(error){
-        console.error(error);
-      }finally{
-        setLoading(false);
-      }
-    };
+  const loadOrder = useCallback(async () => {
+    try {
+      const data = await orderApi.getOrderById(orderId);
+      setOrder(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  }, [orderId]);
 
-    useEffect(()=>{
+  useEffect(() => {
+    loadOrder();
+  }, [loadOrder]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
       loadOrder();
-    },[]);
+    }, 10000);
 
-    useEffect(()=>{
-      const interval =setInterval(()=>{
-        loadOrder();
-      },10000);
-      return ()=>clearInterval(interval);
-    },[]);
+    return () => clearInterval(interval);
+  }, [loadOrder]);
 
   if(loading){
     return(
@@ -101,6 +102,7 @@ export default function OrderDetailsScreen() {
     <SafeAreaView className="flex-1 bg-zinc-950">
       <ScrollView 
       className="p-4"
+      contentContainerClassName="pb-24"
       refreshControl={
         <RefreshControl
           refreshing={refreshing}
