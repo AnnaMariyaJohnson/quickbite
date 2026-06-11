@@ -22,6 +22,7 @@ import { useAuthStore } from '../store/authStore';
 import { useCartStore } from '../store/cartStore';
 import { RootStackParamList, TabParamList } from './types';
 import FavoritesScreen from '../screens/profile/FavoritesScreen';
+import NotificationsScreen from '../screens/profile/NotificationsScreen';
 
 const Tab = createBottomTabNavigator<TabParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -149,6 +150,11 @@ export default function RootNavigator() {
       <Stack.Screen
         name="Favorites"
         component={FavoritesScreen}
+      />
+
+      <Stack.Screen
+        name="Notifications"
+        component={NotificationsScreen}
       />
     </Stack.Navigator>
     

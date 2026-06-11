@@ -1,17 +1,39 @@
 import { NavigationProp, useNavigation } from '@react-navigation/native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { RootStackParamList } from '../../navigation/types';
 import { useAuthStore } from '../../store/authStore';
-;
+import { notificationApi } from '../../api/notificationApi';
 
 type ProfileScreenNavigationProp = NavigationProp<RootStackParamList>;
 
 export default function ProfileScreen() {
   const {user,logout,isAuthenticated}=useAuthStore();
   const navigation=useNavigation<ProfileScreenNavigationProp>();
+  const [unreadCount, setUnreadCount] =useState(0);
+
+  const loadUnreadCount = async () => {
+    if (!user?.id) {
+      return;
+    }
+
+    try {
+      const count =
+        await notificationApi.getUnreadCount(
+          user.id,
+        );
+
+      setUnreadCount(count);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    loadUnreadCount();
+  }, [user?.id]);
 
   const handleLogout=()=>{
     Alert.alert('Logout','Are you sure you want to logout?',[
@@ -99,11 +121,38 @@ export default function ProfileScreen() {
                     navigation.navigate('Favorites');
                     break;
 
+                  case 'Notifications':
+                    navigation.navigate('Notifications')
+                    break;
+
                 default:
                   break;
               }
             }}>
-              <Icon name={item.icon} size={28} color="#71717a" />
+               {item.title === 'Notifications' ? (
+                <View className='mr-4'>
+                  <Icon
+                    name="notifications"
+                    size={28}
+                    color="#71717a"
+                  />
+
+                  {unreadCount > 0 && (
+                    <View className="absolute -top-1 -right-1 bg-red-500 rounded-full min-w-[18px] h-[18px] items-center justify-center">
+                      <Text className="text-white text-[10px]">
+                        {unreadCount}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              ) : (
+                <Icon
+                  name={item.icon}
+                  size={28}
+                  color="#71717a"
+                  style={{marginRight:16}}
+                />
+              )}
               <Text className="text-white text-lg flex-1">{item.title}</Text>
               <Icon name="chevron-right" size={28} color="#71717a" />
             </TouchableOpacity>

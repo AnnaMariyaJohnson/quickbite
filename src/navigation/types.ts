@@ -27,6 +27,7 @@ export type RootStackParamList={
     id: string;
     };
     Favorites:undefined;
+    Notifications: undefined;
 }
 
 export type TabParamList={
