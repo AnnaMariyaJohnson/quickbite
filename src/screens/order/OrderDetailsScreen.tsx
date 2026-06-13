@@ -5,6 +5,7 @@ import {
 } from '@react-navigation/native';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
+  Alert,
   RefreshControl,
   ScrollView,
   Text,
@@ -97,6 +98,31 @@ export default function OrderDetailsScreen() {
       </SafeAreaView>
     );
   }
+
+  const handleCancelOrder = async () => {
+    Alert.alert(
+      'Cancel Order',
+      'Are you sure you want to cancel this order?',
+      [
+        {
+          text: 'No',
+          style: 'cancel',
+        },
+        {
+          text: 'Yes',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await orderApi.cancelOrder(orderId);
+              await loadOrder();
+            } catch (error) {
+              console.error(error);
+            }
+          },
+        },
+      ],
+    );
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-zinc-950">
@@ -292,6 +318,18 @@ export default function OrderDetailsScreen() {
           </Text>
 
         </View>
+
+        {order.status !== 'Delivered' &&
+        order.status !== 'Cancelled' && (
+          <TouchableOpacity
+            onPress={handleCancelOrder}
+            className="bg-red-600 p-4 rounded-2xl mt-4"
+          >
+            <Text className="text-white text-center font-semibold">
+              Cancel Order
+            </Text>
+          </TouchableOpacity>
+        )}
 
       </ScrollView>
     </SafeAreaView>

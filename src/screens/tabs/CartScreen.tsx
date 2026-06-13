@@ -1,11 +1,11 @@
-import React from 'react';
-import { View, Text, ScrollView,  TouchableOpacity,  } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useCartStore } from '../../store/cartStore';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../../navigation/types';
+import React from 'react';
+import { ScrollView, Text, TouchableOpacity, View, } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { RootStackParamList } from '../../navigation/types';
+import { useCartStore } from '../../store/cartStore';
 
 export default function CartScreen() {
   const { items, removeFromCart, increaseQuantity, decreaseQuantity } = useCartStore();
@@ -48,11 +48,11 @@ export default function CartScreen() {
         </View>
 
         {/* Cart Items */}
-        <View className="p-4 space-y-4">
+        <View className="p-4">
           {items.map((item) => (
             <View
               key={item.id}
-              className="bg-zinc-900 rounded-3xl p-4 flex-row"
+              className="bg-zinc-900 rounded-3xl p-4 flex-row mb-4"
             >
 
               {/* Details */}

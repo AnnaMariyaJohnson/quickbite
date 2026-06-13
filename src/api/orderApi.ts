@@ -27,4 +27,9 @@ export const orderApi={
         const response=await api.get(`/Orders/${id}`);
         return response.data;
     },
+
+    cancelOrder:async(id:string)=>{
+        const response=await api.put(`/Orders/${id}/cancel`);
+        return response.data;
+    }
 }
